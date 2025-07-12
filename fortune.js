@@ -511,16 +511,83 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function fetchAstrology() {
         try {
-            const response = await fetch('https://aztro.sameerkumar.website/?sign=pisces&day=today', {
-                method: 'POST'
-            });
-            if (!response.ok) {
-                throw new Error('Network response was not ok.');
+            // 嘗試多個星座 API 來源
+            const apiSources = [
+                {
+                    url: 'https://horoscope-app-api.vercel.app/api/v1/get-horoscope/daily?sign=pisces&day=today',
+                    method: 'GET',
+                    name: 'Horoscope App'
+                },
+                {
+                    url: 'https://aztro.sameerkumar.website/?sign=pisces&day=today',
+                    method: 'POST',
+                    name: 'Aztro'
+                },
+                {
+                    url: 'https://any.ge/horoscope/api/?sign=pisces&type=daily',
+                    method: 'GET',
+                    name: 'Any.ge'
+                }
+            ];
+
+            for (const source of apiSources) {
+                try {
+                    console.log(`嘗試從 ${source.name} 獲取星座資訊...`);
+                    
+                    const response = await fetch(source.url, {
+                        method: source.method,
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        console.log(`成功從 ${source.name} 獲取資料:`, data);
+                        
+                        // 標準化回應格式
+                        if (data.description) {
+                            return { description: data.description, source: source.name };
+                        } else if (data.data && data.data.horoscope_data) {
+                            return { description: data.data.horoscope_data, source: source.name };
+                        } else if (data.horoscope) {
+                            return { description: data.horoscope, source: source.name };
+                        } else if (data.text) {
+                            return { description: data.text, source: source.name };
+                        } else if (data.content) {
+                            return { description: data.content, source: source.name };
+                        } else if (typeof data === 'string') {
+                            return { description: data, source: source.name };
+                        }
+                    }
+                } catch (apiError) {
+                    console.warn(`${source.name} API 失敗:`, apiError.message);
+                    continue;
+                }
             }
-            return await response.json();
+            
+            // 如果所有 API 都失敗，使用預設內容
+            throw new Error('所有星座 API 來源都無法使用');
+            
         } catch (error) {
             console.error("無法獲取星座運勢:", error);
-            return null;
+            
+            // 回傳隨機的預設星象主題
+            const defaultThemes = [
+                "今日的宇宙能量提醒我們關注內在的成長與變化，星象鼓勵我們保持開放的心態。",
+                "星象顯示今天是反思和計劃的好時機，宇宙的能量支持我們做出明智的決定。",
+                "今日的行星排列帶來創新和靈感的能量，適合開始新的項目或學習新技能。",
+                "星象暗示今天適合加強人際關係，宇宙的愛與和諧能量特別強烈。",
+                "今日的天體運行鼓勵我們關注健康和身心平衡，是自我照顧的絕佳時機。",
+                "星象預示著今天的直覺力特別敏銳，相信內在的聲音會帶來正確的指引。",
+                "宇宙的能量流動提醒我們保持耐心和堅持，成功需要時間的醞釀。"
+            ];
+            
+            const randomTheme = defaultThemes[Math.floor(Math.random() * defaultThemes.length)];
+            return { 
+                description: randomTheme,
+                source: 'fallback'
+            };
         }
     }
 
@@ -549,11 +616,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const textColor = getContrastingTextColor(luckyColorHex);
 
         const astroTheme = astroData ? astroData.description : "今日的宇宙能量提醒我們關注內在的成長與變化。";
+        const isApiFallback = astroData && astroData.source === 'fallback';
 
         return `
             <p style="text-align: center; color: #a0a0a0; border-bottom: 1px solid #333; padding-bottom: 15px;">
                 <strong>幸運色:</strong> <span style="background-color: ${luckyColorHex}; color: ${textColor}; padding: 3px 10px; border-radius: 5px; font-weight: bold;">${luckyColorName}</span> | 
                 <strong>今日卦象:</strong> ${hexagram.name}
+                ${isApiFallback ? ' | <span style="color: #888; font-size: 0.9em;">✨ 智能預測</span>' : ''}
             </p>
 
             <h4><strong>今日主題：星象的啟示</strong></h4>
@@ -720,11 +789,19 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             fortuneContainer.innerHTML = "<p>正在為您連接宇宙的智慧，請稍候...</p>";
 
+            console.log("開始生成今日運勢...");
+            
             const iChingResult = simulateIChing();
+            console.log("易經卦象生成完成:", iChingResult);
+            
+            console.log("開始獲取星座資訊...");
             const astroData = await fetchAstrology();
+            console.log("星座資訊獲取完成:", astroData);
             
             const analysisHTML = generateGrandAnalysis(astroData, iChingResult);
             fortuneContainer.innerHTML = analysisHTML;
+            
+            console.log("運勢分析生成完成");
 
         } catch (error) {
             console.error("生成運勢時發生錯誤:", error);
