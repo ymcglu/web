@@ -3,56 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hobbes Lu - 個人履歷</title>
+    <title>Hobbes Lu - 個人首頁</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
-        <h1>Hobbes Lu - 個人履歷</h1>
+        <h1>Hobbes Lu</h1>
+        <nav>
+            <a href="eat/what_to_eat.html">今天吃什麼？</a>
+        </nav>
     </header>
     <main>
-        <section id="contact">
-            <h2>聯絡資訊</h2>
-            <p>電子郵件：[請填寫您的電子郵件]</p>
-            <p>電話：[請填寫您的電話]</p>
-            <p>LinkedIn: [請填寫您的 LinkedIn 個人檔案連結]</p>
-        </section>
-
-        <section id="summary">
-            <h2>個人簡介</h2>
-            <p>一位經驗豐富且充滿熱情的 Unity 開發者，專注於創造高品質的互動式體驗與遊戲。具備獨立開發與團隊合作的能力。</p>
-        </section>
-
-        <section id="experience">
-            <h2>工作經歷</h2>
-            <h3>[公司名稱] - [您的職位]</h3>
-            <p><em>[開始日期] - [結束日期]</em></p>
+        <section id="about-me">
+            <h2>關於我</h2>
             <ul>
-                <li>在這裡描述您的主要職責與成就。</li>
-                <li>例如：負責開發 Unity 專案 (p230302_new) 的核心功能。</li>
-                <li>優化應用程式效能，提升使用者體驗。</li>
+                <li><strong>英文名:</strong> Hobbes Lu</li>
+                <li><strong>生日:</strong> 1980年3月4日, 凌晨2:30</li>
+                <li><strong>農曆生日:</strong> 猴年正月十八</li>
+                <li><strong>星座:</strong> 雙魚座</li>
+                <li><strong>血型:</strong> A型</li>
+                <li><strong>MBTI 人格:</strong> INFJ</li>
+                <li><strong>生命靈數:</strong> 7</li>
+                <li><strong>出生地:</strong> 台灣新北市新店區</li>
+                <li><strong>現居地:</strong> 新北市新店區</li>
+                <li><strong>工作地:</strong> 台北市</li>
             </ul>
         </section>
 
-        <section id="education">
-            <h2>學歷</h2>
-            <h3>[您的學校名稱] - [您的學位]</h3>
-            <p><em>[畢業年份]</em></p>
-        </section>
-
-        <section id="skills">
-            <h2>專業技能</h2>
+        <section id="professional-profile">
+            <h2>職業背景</h2>
             <ul>
-                <li>Unity Engine</li>
-                <li>C#</li>
-                <li>遊戲開發</li>
-                <li>UI/UX 設計</li>
-                <li>版本控制 (Git)</li>
+                <li><strong>職業:</strong> Unity3D / Web3D 前端工程師</li>
+                <li><strong>工作內容:</strong> 為智慧建築、自動化工廠和戰情室編寫警報和資訊系統。</li>
+                <li><strong>程式碼理念:</strong> 努力撰寫高品質、可讀、可擴展和可維護的程式碼。</li>
             </ul>
         </section>
+
+        <section id="interests">
+            <h2>興趣與偏好</h2>
+            <ul>
+                <li><strong>興趣:</strong> 動漫、遊戲和音樂。</li>
+                <li><strong>偏好語言:</strong> 繁體中文。</li>
+                <li><strong>互動偏好:</strong> 尋求對問題和想法進行公平、客觀、合乎邏輯和基於事實的分析，並欣賞建設性的批評和改進建議，而不是奉承。</li>
+            </ul>
+        </section>
+
+        <section id="daily-fortune">
+            <h2>每日運勢與建議</h2>
+            <div id="fortune-content"></div>
+        </section>
+
     </main>
     <footer>
         <p>&copy; 2025 Hobbes Lu</p>
     </footer>
+    <script src="fortune.js"></script>
 </body>
 </html>
