@@ -532,36 +532,58 @@ document.addEventListener('DOMContentLoaded', function() {
 
             for (const source of apiSources) {
                 try {
-                    console.log(`嘗試從 ${source.name} 獲取星座資訊...`);
+                    console.log(`🌟 嘗試從 ${source.name} 獲取星座資訊...`);
                     
-                    const response = await fetch(source.url, {
+                    // 創建帶有超時的 Promise
+                    const timeoutPromise = new Promise((_, reject) => 
+                        setTimeout(() => reject(new Error('請求超時')), 5000)
+                    );
+                    
+                    const fetchPromise = fetch(source.url, {
                         method: source.method,
                         headers: {
-                            'Content-Type': 'application/json'
-                        }
+                            'Content-Type': 'application/json',
+                            'User-Agent': 'Mozilla/5.0 (compatible; FortuneApp/1.0)'
+                        },
+                        mode: 'cors'
                     });
+                    
+                    const response = await Promise.race([fetchPromise, timeoutPromise]);
                     
                     if (response.ok) {
                         const data = await response.json();
-                        console.log(`成功從 ${source.name} 獲取資料:`, data);
+                        console.log(`✅ 成功從 ${source.name} 獲取資料:`, data);
                         
                         // 標準化回應格式
+                        let description = null;
                         if (data.description) {
-                            return { description: data.description, source: source.name };
+                            description = data.description;
                         } else if (data.data && data.data.horoscope_data) {
-                            return { description: data.data.horoscope_data, source: source.name };
+                            description = data.data.horoscope_data;
                         } else if (data.horoscope) {
-                            return { description: data.horoscope, source: source.name };
+                            description = data.horoscope;
                         } else if (data.text) {
-                            return { description: data.text, source: source.name };
+                            description = data.text;
                         } else if (data.content) {
-                            return { description: data.content, source: source.name };
+                            description = data.content;
                         } else if (typeof data === 'string') {
-                            return { description: data, source: source.name };
+                            description = data;
                         }
+                        
+                        if (description) {
+                            console.log(`🎯 星象解析成功: ${source.name}`);
+                            return { 
+                                description: description, 
+                                source: source.name,
+                                success: true
+                            };
+                        }
+                    } else {
+                        console.warn(`❌ ${source.name} 回應錯誤: ${response.status}`);
                     }
+                    
                 } catch (apiError) {
-                    console.warn(`${source.name} API 失敗:`, apiError.message);
+                    console.warn(`⚠️ ${source.name} API 失敗:`, apiError.message);
                     continue;
                 }
             }
@@ -570,11 +592,17 @@ document.addEventListener('DOMContentLoaded', function() {
             throw new Error('所有星座 API 來源都無法使用');
             
         } catch (error) {
-            console.error("無法獲取星座運勢:", error);
+            console.error("🔴 無法獲取星座運勢:", error.message);
             
-            // 回傳隨機的預設星象主題
+            // 回傳智能化的預設星象主題
+            const currentHour = new Date().getHours();
+            const seasonalThemes = getSeasonalThemes();
+            const timeBasedThemes = getTimeBasedThemes(currentHour);
+            
             const defaultThemes = [
-                "今日的宇宙能量提醒我們關注內在的成長與變化，星象鼓勵我們保持開放的心態。",
+                ...seasonalThemes,
+                ...timeBasedThemes,
+                "今日的宇宙能量提醒我們關注內在的成長與變化，星象鼓勵我們保持開放的心態面對新的可能性。",
                 "星象顯示今天是反思和計劃的好時機，宇宙的能量支持我們做出明智的決定。",
                 "今日的行星排列帶來創新和靈感的能量，適合開始新的項目或學習新技能。",
                 "星象暗示今天適合加強人際關係，宇宙的愛與和諧能量特別強烈。",
@@ -584,10 +612,59 @@ document.addEventListener('DOMContentLoaded', function() {
             ];
             
             const randomTheme = defaultThemes[Math.floor(Math.random() * defaultThemes.length)];
+            console.log(`🌙 使用智能預測主題: ${randomTheme.substring(0, 30)}...`);
+            
             return { 
                 description: randomTheme,
-                source: 'fallback'
+                source: 'AI智能預測',
+                success: false
             };
+        }
+    }
+    
+    // 輔助函數：獲取季節性主題
+    function getSeasonalThemes() {
+        const month = new Date().getMonth() + 1;
+        if (month >= 3 && month <= 5) { // 春季
+            return [
+                "春季的能量帶來新生與希望，星象鼓勵我們播種夢想，為未來做好準備。",
+                "春分的力量提醒我們平衡的重要性，今日適合調和生活中的各個面向。"
+            ];
+        } else if (month >= 6 && month <= 8) { // 夏季
+            return [
+                "夏日的熱情能量激發我們的創造力，星象支持大膽的行動和表達。",
+                "夏至的光明力量照亮我們的道路，今日適合展現真實的自我。"
+            ];
+        } else if (month >= 9 && month <= 11) { // 秋季
+            return [
+                "秋季的收穫能量提醒我們感恩與分享，星象鼓勵我們回顧並整理過往。",
+                "秋分的智慧引導我們放下不需要的東西，為新的循環做準備。"
+            ];
+        } else { // 冬季
+            return [
+                "冬季的內省能量邀請我們深入內心，星象支持冥想和精神成長。",
+                "冬至的重生力量提醒我們，在最黑暗的時刻，光明正在醞釀。"
+            ];
+        }
+    }
+    
+    // 輔助函數：獲取時間性主題
+    function getTimeBasedThemes(hour) {
+        if (hour >= 5 && hour < 12) { // 早晨
+            return [
+                "晨曦的能量帶來新的開始，星象鼓勵我們以樂觀的心態迎接這一天。",
+                "日出的力量象徵著無限的可能性，今日適合設定目標並採取行動。"
+            ];
+        } else if (hour >= 12 && hour < 18) { // 下午
+            return [
+                "午後的陽光能量支持我們的決策和執行，星象鼓勵積極的溝通與合作。",
+                "日中的活力提醒我們把握當下，今日適合處理重要的事務。"
+            ];
+        } else { // 晚上
+            return [
+                "夜晚的寧靜能量邀請我們反思和整合，星象支持內在的智慧探索。",
+                "月亮的柔和光芒指引我們關注情感和直覺，今日適合深度的自我對話。"
+            ];
         }
     }
 
@@ -616,28 +693,29 @@ document.addEventListener('DOMContentLoaded', function() {
         const textColor = getContrastingTextColor(luckyColorHex);
 
         const astroTheme = astroData ? astroData.description : "今日的宇宙能量提醒我們關注內在的成長與變化。";
-        const isApiFallback = astroData && astroData.source === 'fallback';
+        const isApiFallback = astroData && (astroData.source === 'fallback' || astroData.source === 'AI智能預測');
+        const apiStatus = astroData && astroData.success === false ? 'AI智能預測' : (astroData && astroData.source ? `${astroData.source}` : '宇宙智慧');
 
         return `
             <p style="text-align: center; color: #a0a0a0; border-bottom: 1px solid #333; padding-bottom: 15px;">
                 <strong>幸運色:</strong> <span style="background-color: ${luckyColorHex}; color: ${textColor}; padding: 3px 10px; border-radius: 5px; font-weight: bold;">${luckyColorName}</span> | 
-                <strong>今日卦象:</strong> ${hexagram.name}
-                ${isApiFallback ? ' | <span style="color: #888; font-size: 0.9em;">✨ 智能預測</span>' : ''}
+                <strong>今日卦象:</strong> ${hexagram.name} | 
+                <span style="color: #888; font-size: 0.9em;">${apiStatus}</span>
             </p>
+
+            <h4><strong>策略：易經的智慧箴言</strong></h4>
+            <p>針對今日的能量主題，易經為您指引的策略核心，來自 <strong>${hexagram.name}卦</strong> 的第 <strong>${changingLine + 1}</strong> 爻，其爻辭為：</p>
+            <p class="yao-ci">「${yaoCi}」</p>
+            <p style="font-style: italic; color: #c0c0c0;"><strong>爻辭淺釋：</strong>${yaoCiExplanation}</p>
+
+            <h4><strong>綜合建議：今日的行動方案</strong></h4>
+            <div style="line-height: 1.6; white-space: pre-line;">${interpret(astroTheme, zwdsProfile, hexagram.name, yaoCi)}</div>
 
             <h4><strong>今日主題：星象的啟示</strong></h4>
             <p>${astroTheme}</p>
 
             <h4><strong>根基：您的紫微斗數命盤特質</strong></h4>
             <p>${zwdsProfile.analysis}</p>
-
-            <h4><strong>策略：易經的智慧箴言</strong></h4>
-            <p>針對今日的能量主題，易經為您指引的策略核心，來自 <strong>${hexagram.name}卦</strong> 的第 <strong>${changingLine + 1}</strong> 爻，其爻辭為：</p>
-            <p class="yao-ci">「${yaoCi}」</p>
-            <p style="font-style: italic; color: #c0c0c0;"><strong>爻辭淺釋：</strong>${yaoCiExplanation}</p>
-            
-            <h4><strong>綜合建議：今日的行動方案</strong></h4>
-            <p>${interpret(astroTheme, zwdsProfile, hexagram.name, yaoCi)}</p>
         `;
     }
     
@@ -645,65 +723,65 @@ document.addEventListener('DOMContentLoaded', function() {
         // 提取星象關鍵詞進行更精準分析
         const astroKeywords = extractAstroKeywords(astroTheme);
         
-        let advice = `🌟 **宇宙能量解析** 🌟\n`;
+        let advice = `<strong>宇宙能量解析</strong>\n`;
         advice += `今日星象呈現「${astroKeywords.theme}」的能量特質，這與您命盤中「${zwdsProfile.mainStars}」的核心特質形成${astroKeywords.harmony}的共振。`;
         
         // 易經卦象深度解析
         const hexagramInsight = getHexagramInsight(hexagramName);
-        advice += `\n\n📿 **易經智慧核心** 📿\n`;
+        advice += `\n\n<strong>易經智慧核心</strong>\n`;
         advice += `${hexagramName}卦象徵著「${hexagramInsight.meaning}」，而今日變爻「${yaoCi}」正是這個能量場中的關鍵轉折點。`;
         
         // 根據爻辭內容進行多層次分析
         const yaoCiAnalysis = analyzeYaoCi(yaoCi);
-        advice += `\n\n🎯 **今日行動策略** 🎯\n`;
+        advice += `\n\n<strong>今日行動策略</strong>\n`;
         
         if (yaoCiAnalysis.type === "highly_auspicious") {
-            advice += `✨ **大吉大利的一天！** 這是宇宙為您開啟的黃金時機。\n`;
-            advice += `• **行動建議**：大膽地推進重要計劃，您的天機星智慧與巨門星溝通力將如虎添翼。\n`;
-            advice += `• **人際關係**：主動聯繫重要人物，今日的交流將帶來意想不到的收穫。\n`;
-            advice += `• **決策時機**：信任您的直覺，重要決定可以在今天做出。\n`;
-            advice += `• **注意事項**：雖然運勢極佳，但仍要保持謙遜，避免過度自信。`;
+            advice += `<strong>大吉大利的一天！</strong> 這是宇宙為您開啟的黃金時機。\n`;
+            advice += `• <strong>行動建議</strong>：大膽地推進重要計劃，您的天機星智慧與巨門星溝通力將如虎添翼。\n`;
+            advice += `• <strong>人際關係</strong>：主動聯繫重要人物，今日的交流將帶來意想不到的收穫。\n`;
+            advice += `• <strong>決策時機</strong>：信任您的直覺，重要決定可以在今天做出。\n`;
+            advice += `• <strong>注意事項</strong>：雖然運勢極佳，但仍要保持謙遜，避免過度自信。`;
             
         } else if (yaoCiAnalysis.type === "auspicious") {
-            advice += `🌸 **順遂吉利的時光** 今日的能量流動對您有利。\n`;
-            advice += `• **行動建議**：適合進行中等規模的計劃推進，穩步前行最為合適。\n`;
-            advice += `• **溝通技巧**：運用您巨門星的雄辯之才，但要注意語調的溫和。\n`;
-            advice += `• **學習成長**：天機星的求知慾在今日特別旺盛，適合學習新知識。\n`;
-            advice += `• **財運提醒**：小有進帳的可能，但不宜進行大額投資。`;
+            advice += `<strong>順遂吉利的時光</strong> 今日的能量流動對您有利。\n`;
+            advice += `• <strong>行動建議</strong>：適合進行中等規模的計劃推進，穩步前行最為合適。\n`;
+            advice += `• <strong>溝通技巧</strong>：運用您巨門星的雄辯之才，但要注意語調的溫和。\n`;
+            advice += `• <strong>學習成長</strong>：天機星的求知慾在今日特別旺盛，適合學習新知識。\n`;
+            advice += `• <strong>財運提醒</strong>：小有進帳的可能，但不宜進行大額投資。`;
             
         } else if (yaoCiAnalysis.type === "challenging") {
-            advice += `⚠️ **謹慎行事的考驗期** 宇宙在考驗您的智慧與耐心。\n`;
-            advice += `• **行動建議**：今日宜守不宜攻，將注意力轉向內在的反思與調整。\n`;
-            advice += `• **溝通禁忌**：巨門星容易帶來口舌是非，說話前請三思而後言。\n`;
-            advice += `• **智慧運用**：天機星的分析能力是您的護身符，凡事深思熟慮。\n`;
-            advice += `• **情緒管理**：保持內心平靜，避免因小事而情緒波動。\n`;
-            advice += `• **轉機預兆**：困難是成長的契機，堅持正道必有轉機。`;
+            advice += `<strong>謹慎行事的考驗期</strong> 宇宙在考驗您的智慧與耐心。\n`;
+            advice += `• <strong>行動建議</strong>：今日宜守不宜攻，將注意力轉向內在的反思與調整。\n`;
+            advice += `• <strong>溝通禁忌</strong>：巨門星容易帶來口舌是非，說話前請三思而後言。\n`;
+            advice += `• <strong>智慧運用</strong>：天機星的分析能力是您的護身符，凡事深思熟慮。\n`;
+            advice += `• <strong>情緒管理</strong>：保持內心平靜，避免因小事而情緒波動。\n`;
+            advice += `• <strong>轉機預兆</strong>：困難是成長的契機，堅持正道必有轉機。`;
             
         } else if (yaoCiAnalysis.type === "neutral_safe") {
-            advice += `🧘 **平和中正的守護期** 保持現狀是最明智的選擇。\n`;
-            advice += `• **行動建議**：專注於日常事務的完善，不求突破但求穩固。\n`;
-            advice += `• **心境修養**：這是您INFJ特質發揮的好時機，傾聽內在聲音。\n`;
-            advice += `• **人際和諧**：以誠待人，避免捲入爭端，和為貴。\n`;
-            advice += `• **自我提升**：閱讀、思考、冥想都是今日的良好選擇。\n`;
-            advice += `• **準備期**：為未來的機會做好準備，機會總是留給有準備的人。`;
+            advice += `<strong>平和中正的守護期</strong> 保持現狀是最明智的選擇。\n`;
+            advice += `• <strong>行動建議</strong>：專注於日常事務的完善，不求突破但求穩固。\n`;
+            advice += `• <strong>心境修養</strong>：這是您INFJ特質發揮的好時機，傾聽內在聲音。\n`;
+            advice += `• <strong>人際和諧</strong>：以誠待人，避免捲入爭端，和為貴。\n`;
+            advice += `• <strong>自我提升</strong>：閱讀、思考、冥想都是今日的良好選擇。\n`;
+            advice += `• <strong>準備期</strong>：為未來的機會做好準備，機會總是留給有準備的人。`;
             
         } else {
-            advice += `🔍 **觀察思辨的洞察期** 宇宙正在向您傳遞重要訊息。\n`;
-            advice += `• **敏銳觀察**：運用您天機星的洞察力，細心觀察環境變化。\n`;
-            advice += `• **深度思考**：今日適合進行哲學性的思考，探索事物的本質。\n`;
-            advice += `• **預兆解讀**：注意生活中的小細節，它們可能隱含著重要訊息。\n`;
-            advice += `• **耐心等待**：有時候不行動也是一種行動，等待適當時機。\n`;
-            advice += `• **直覺培養**：相信您的第六感，它會為您指引正確方向。`;
+            advice += `<strong>觀察思辨的洞察期</strong> 宇宙正在向您傳遞重要訊息。\n`;
+            advice += `• <strong>敏銳觀察</strong>：運用您天機星的洞察力，細心觀察環境變化。\n`;
+            advice += `• <strong>深度思考</strong>：今日適合進行哲學性的思考，探索事物的本質。\n`;
+            advice += `• <strong>預兆解讀</strong>：注意生活中的小細節，它們可能隱含著重要訊息。\n`;
+            advice += `• <strong>耐心等待</strong>：有時候不行動也是一種行動，等待適當時機。\n`;
+            advice += `• <strong>直覺培養</strong>：相信您的第六感，它會為您指引正確方向。`;
         }
         
         // 特殊情況的額外提醒
         const specialAdvice = getSpecialAdvice(yaoCi, hexagramName);
         if (specialAdvice) {
-            advice += `\n\n💎 **特別提醒** 💎\n${specialAdvice}`;
+            advice += `\n\n<strong>特別提醒</strong>\n${specialAdvice}`;
         }
         
         // 結語與祝福
-        advice += `\n\n🙏 **今日祝福** 🙏\n`;
+        advice += `\n\n<strong>今日祝福</strong>\n`;
         advice += `願您在天機星的智慧指引下，用巨門星的真誠溝通，與宇宙的節奏和諧共振，度過充實而有意義的一天。記住，每一個當下都是最好的時刻，每一次選擇都在創造您的未來。`;
         
         return advice;
