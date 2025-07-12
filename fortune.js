@@ -147,7 +147,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             <h4><strong>策略：易經的智慧箴言</strong></h4>
             <p>針對今日的能量主題，易經為您指引的策略核心，來自 <strong>${hexagram.name}卦</strong> 的第 <strong>${changingLine + 1}</strong> 爻，其爻辭為：</p>
-            <p style="font-size: 1.3em; font-weight: bold; text-align: center; color: #4267B2; padding: 15px; background-color: #f8f9fa; border-radius: 5px;">「${yaoCi}」</p>
+            <p class="yao-ci">「${yaoCi}」</p>
             
             <h4><strong>綜合建議：今日的行動方案</strong></h4>
             <p>${interpret(astroTheme, zwdsProfile, hexagram.name, yaoCi)}</p>
