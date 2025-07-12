@@ -1,60 +1,142 @@
+/* 基本設定 */
 body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     margin: 0;
     padding: 0;
     background-color: #f0f2f5;
     color: #1c1e21;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
+/* 頁首 */
 header {
-    background-color: #4267B2;
-    color: #fff;
-    padding: 1.5rem 0;
+    background-color: #fff;
+    color: #1c1e21;
+    padding: 2rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
     text-align: center;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-bottom: 1px solid #dddfe2;
 }
 
 header h1 {
     margin: 0;
-    font-size: 2.5rem;
+    font-size: 2.8rem;
+    color: #4267B2;
 }
 
-nav {
-    margin-top: 1rem;
+/* 每日運勢 */
+#daily-fortune {
+    margin-top: 1.5rem;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
 }
 
-nav a {
-    color: #fff;
-    text-decoration: none;
-    padding: 0.5rem 1rem;
+#daily-fortune h2 {
+    font-size: 1.2rem;
+    color: #606770;
+    margin: 0 0 15px 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+#daily-fortune h4 {
+    color: #365899;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #dfe3ee;
+    font-size: 1.3rem;
+}
+
+#daily-fortune p {
+    line-height: 1.7;
+    font-size: 1.1rem;
+}
+
+#daily-fortune .yao-ci {
+    font-size: 1.25em;
+    font-weight: bold;
+    text-align: center;
+    color: #d9534f;
+    padding: 15px;
+    background-color: #fff;
+    border: 1px dashed #d9534f;
     border-radius: 5px;
-    transition: background-color 0.3s;
+    margin: 1em 0;
 }
 
-nav a:hover {
-    background-color: #365899;
+/* 主容器 */
+.main-container {
+    display: flex;
+    flex: 1;
 }
 
-main {
-    padding: 2rem;
-    margin: 20px auto;
-    max-width: 900px;
+/* 側邊導覽列 */
+.sidebar {
+    width: 220px;
+    background-color: #fff;
+    padding: 20px;
+    border-right: 1px solid #dddfe2;
 }
 
-section {
+.sidebar nav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar nav li {
+    margin-bottom: 10px;
+}
+
+.sidebar .nav-link {
+    display: block;
+    padding: 12px 18px;
+    color: #333;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 1.1rem;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.sidebar .nav-link:hover {
+    background-color: #f0f2f5;
+}
+
+.sidebar .nav-link.active {
+    background-color: #4267B2;
+    color: #fff;
+    font-weight: bold;
+}
+
+/* 內容顯示區 */
+.content-area {
+    flex: 1;
+    padding: 30px;
+    background-color: #f0f2f5;
+}
+
+.content-section {
+    display: none; /* 預設隱藏 */
+}
+
+.content-section.active {
+    display: block; /* 啟用時顯示 */
+}
+
+.content-section section {
     background: #fff;
     padding: 25px;
     margin-bottom: 25px;
     border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-    transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
-section:hover {
-    box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
-}
-
-h2 {
+.content-section h2 {
     color: #4267B2;
     border-bottom: 2px solid #dfe3ee;
     padding-bottom: 10px;
@@ -62,102 +144,60 @@ h2 {
     font-size: 1.8rem;
 }
 
-ul {
+.content-section ul {
     list-style-type: none;
     padding-left: 0;
 }
 
-li {
-    padding: 8px 0;
+.content-section li {
+    padding: 10px 0;
     border-bottom: 1px solid #eee;
     display: flex;
     align-items: center;
 }
 
-li:last-child {
+.content-section li:last-child {
     border-bottom: none;
 }
 
-li strong {
+.content-section li strong {
     color: #333;
-    min-width: 150px;
+    min-width: 160px;
     font-weight: 600;
 }
 
+/* 頁尾 */
 footer {
     text-align: center;
     padding: 1.5rem 0;
-    background-color: #f0f2f5;
+    background-color: #fff;
     color: #606770;
-    margin-top: 30px;
     border-top: 1px solid #dddfe2;
 }
 
-#daily-fortune h4 {
-    color: #365899;
-    margin-top: 25px;
-    margin-bottom: 10px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid #dfe3ee;
-    font-size: 1.4rem;
-    font-weight: 600;
-}
-
-#daily-fortune p {
-    line-height: 1.7;
-    font-size: 1.1rem;
-    text-indent: 2em;
-}
-
-#daily-fortune #fortune-content > p:first-of-type {
-    text-indent: 0;
-    text-align: center;
-    font-size: 1.1rem;
-    color: #606770;
-    padding-bottom: 15px;
-    margin-bottom: 20px;
-    border-bottom: 1px solid #dddfe2;
-}
-
-#daily-fortune strong {
-    color: #365899;
-}
-
-#daily-fortune .yao-ci {
-    font-size: 1.3em;
-    font-weight: bold;
-    text-align: center;
-    color: #4267B2;
-    padding: 15px;
-    background-color: #f8f9fa;
-    border-radius: 5px;
-    margin: 1em 0;
-    text-indent: 0;
-}
-
-#lucky-color {
-    font-weight: bold;
-    padding: 3px 10px;
-    border-radius: 5px;
-}
-
-/* Responsive Design */
+/* 響應式設計 */
 @media (max-width: 768px) {
-    main {
-        padding: 1rem;
-    }
-    header h1 {
-        font-size: 2rem;
-    }
-    h2 {
-        font-size: 1.5rem;
-    }
-    li {
+    .main-container {
         flex-direction: column;
-        align-items: flex-start;
     }
-    li strong {
-        min-width: auto;
-        margin-bottom: 5px;
+
+    .sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #dddfe2;
+        padding: 10px;
+    }
+
+    .sidebar nav ul {
+        display: flex;
+        justify-content: center;
+    }
+
+    .sidebar nav li {
+        margin: 0 5px;
+    }
+
+    .content-area {
+        padding: 20px;
     }
 }
