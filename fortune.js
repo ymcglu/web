@@ -1,9 +1,7 @@
-
 document.addEventListener('DOMContentLoaded', function() {
 
     // =========================================================================
     // TIER 1: 紫微斗數核心命盤分析 (The Why - 您的根基)
-    // 根據您的生辰 (1980年3月4日 凌晨2:30) 所做的核心分析
     // =========================================================================
     const zwdsProfile = {
         lifePalace: "命宮在寅",
@@ -12,8 +10,32 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     // =========================================================================
+    // NEW: 八卦-五行-色彩 對應資料庫
+    // =========================================================================
+    const guaColors = {
+        '乾': { name: "天界金", hex: "#E5E4E2" },
+        '兌': { name: "澤光銀", hex: "#C0C0C0" },
+        '離': { name: "烈焰紅", hex: "#E34234" },
+        '震': { name: "春雷綠", hex: "#66bb6a" },
+        '巽': { name: "風信青", hex: "#008080" },
+        '坎': { name: "深淵黑", hex: "#2C3539" },
+        '艮': { name: "山石黃", hex: "#DAA520" },
+        '坤': { name: "大地棕", hex: "#8B4513" }
+    };
+
+    const iChingPalace = {
+        1: '乾', 2: '坤', 3: '震', 4: '巽', 5: '巽', 6: '離', 7: '艮', 8: '坤',
+        9: '乾', 10: '兌', 11: '坤', 12: '乾', 13: '離', 14: '乾', 15: '坤', 16: '震',
+        17: '兌', 18: '巽', 19: '坤', 20: '乾', 21: '離', 22: '艮', 23: '乾', 24: '坤',
+        25: '乾', 26: '艮', 27: '艮', 28: '兌', 29: '坎', 30: '離', 31: '兌', 32: '震',
+        33: '乾', 34: '震', 35: '坤', 36: '離', 37: '巽', 38: '離', 39: '坎', 40: '震',
+        41: '艮', 42: '巽', 43: '乾', 44: '乾', 45: '兌', 46: '坤', 47: '兌', 48: '坎',
+        49: '兌', 50: '離', 51: '震', 52: '艮', 53: '巽', 54: '兌', 55: '震', 56: '離',
+        57: '巽', 58: '兌', 59: '巽', 60: '坎', 61: '兌', 62: '震', 63: '坎', 64: '離'
+    };
+
+    // =========================================================================
     // TIER 3: 易經爻辭資料庫 (The How - 今日的策略)
-    // 完整的六十四卦及三百八十四爻辭
     // =========================================================================
     const iChingData = {
         1: { name: "乾", lines: ["潛龍勿用。", "見龍在田，利見大人。", "君子終日乾乾，夕惕若，厲無咎。", "或躍在淵，無咎。", "飛龍在天，利見大人。", "亢龍有悔。"] },
@@ -59,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function() {
         41: { name: "損", lines: ["已事遄往，無咎，酌損之。", "利貞，征凶，弗損益之。", "三人行，則損一人；一人行，則得其友。", "損其疾，使遄有喜，無咎。", "或益之十朋之龜，弗克違，元吉。", "弗損益之，無咎，貞吉，利有攸往，得臣無家。"] },
         42: { name: "益", lines: ["利用為大作，元吉，無咎。", "或益之十朋之龜，弗克違，永貞吉。王用享于帝，吉。", "益之用凶事，無咎。有孚中行，告公用圭。", "中行，告公從。利用為依遷國。", "有孚惠心，勿問元吉。有孚惠我德。", "莫益之，或擊之，立心勿恆，凶。"] },
         43: { name: "夬", lines: ["壯于前趾，往不勝為咎。", "惕號，莫夜有戎，勿恤。", "壯于頄，有凶。君子夬夬，獨行遇雨，若濡有慍，無咎。", "臀無膚，其行次且。牽羊悔亡，聞言不信。", "莧陸夬夬，中行無咎。", "無號，終有凶。"] },
-        44: { name: "姤", lines: ["繫于金柅，貞吉。有攸往，見凶，羸豕孚蹢躅。", "包有魚，無咎，不利賓。", "臀無膚，其行次且，厲，無大咎。", "包無魚，起凶。", "以杞包瓜，含章，有隕自天。", "姤其角，吝，無咎。"] },
+        44: { name: "姤", lines: ["繫于金柅，貞吉。有攸往，見凶，羸豕孚蹢躅。", "包有魚，無咎，不利賓。", "臀無膚，其行次且，厲，無大咎。", "包無魚，起凶。", "以杞包瓜，含章，有隕自天。", "其角，吝，無咎。"] },
         45: { name: "萃", lines: ["有孚不終，乃亂乃萃，若號，一握為笑，勿恤，往無咎。", "引吉，無咎，孚乃利用禴。", "萃如嗟如，無攸利，往無咎，小吝。", "大吉，無咎。", "萃有位，無咎。匪孚，元永貞，悔亡。", "齎咨涕洟，無咎。"] },
         46: { name: "升", lines: ["允升，大吉。", "孚乃利用禴，無咎。", "升虛邑。", "王用亨于岐山，吉無咎。", "貞吉，升階。", "冥升，利于不息之貞。"] },
         47: { name: "困", lines: ["臀困于株木，入于幽谷，三歲不覿。", "困于酒食，朱紱方來，利用亨祀。征凶，無咎。", "困于石，據于蒺藜，入于其宮，不見其妻，凶。", "來徐徐，困于金車，吝，有終。", "劓刖，困于赤紱，乃徐有說，利用祭祀。", "困于葛藟，于臲卼，曰動悔有悔，征吉。"] },
@@ -83,27 +105,71 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     // =========================================================================
+    // NEW: 爻辭白話解釋資料庫 (完整版)
+    // =========================================================================
+    const yaoCiExplanations = {
+        "潛龍勿用。": "時機尚未成熟，就像潛伏的龍，暫時不宜有所行動，應靜待時機。",
+        "見龍在田，利見大人。": "機會已經出現，如同龍出現在田野，此時適合去見有德有位的人，尋求幫助或合作。",
+        "君子終日乾乾，夕惕若，厲無咎。": "君子整日勤奮不懈，即使到了晚上也保持警惕，這樣即使身處險境，也能沒有災禍。",
+        "或躍在淵，無咎。": "可以嘗試行動，但要謹慎，根據情況進退，就不會有錯。",
+        "飛龍在天，利見大人。": "時機完全成熟，如同龍在天上飛翔。這是大展宏圖的好時機，去見大人物會非常有利。",
+        "亢龍有悔。": "事情發展到了極點，不知進退，預示著會有悔恨，提醒人要懂得知進退。",
+        "履霜，堅冰至。": "腳下踩到了薄霜，就要警覺到寒冷的冬天即將來臨。提醒我們要見微知著，防患於未然。",
+        "直方大，不習無不利。": "保持正直、端方、大氣的品德，即使不去刻意學習或修飾，也無往而不利。",
+        "含章可貞，或從王事，無成有終。": "身懷才華而不外露，堅守正道。如果輔佐君王，即使沒有自己的功名，也能善始善終。",
+        "括囊，無咎無譽。": "把袋口紮緊，謹言慎行。這樣既不會有災禍，但也不會得到讚譽，是一種明哲保身的方式。",
+        "黃裳元吉。": "穿著黃色的下裳，這是中庸、謙遜的美德，大吉大利。",
+        "龍戰于野，其血玄黃。": "陰陽兩股力量鬥爭到了極點，在野外展開激戰，兩敗俱傷。預示著極端的鬥爭會帶來慘重的損失。",
+        "磐桓，利居貞，利建侯。": "事情剛開始，困難重重，如磐石般難以動搖。此時利於堅守正道，穩固根基，為未來的發展做準備。",
+        "屯如邅如，乘馬班如，匪寇婚媾。女子貞不字，十年乃字。": "處境困難，徘徊不前，想前進卻又退縮。這不是來搶劫的敵人，而是來求親的。但女子堅守貞潔，一時無法答應，要經過長久的考驗才能結合。",
+        "即鹿無虞，惟入于林中。君子幾，不如舍，往吝。": "如同追逐鹿時沒有熟悉森林的嚮導，只能盲目地進入林中。君子如果預見到這種情況，不如放棄，因為勉強前進只會帶來禍吝。",
+        "乘馬班如，求婚媾，往吉，無不利。": "騎著馬在原地打轉，是在等待時機，尋求好的結合。前往是吉利的，沒有什麼不順遂。",
+        "屯其膏，小貞吉，大貞凶。": "只顧著囤積自己的財富利益，不肯施惠於人。這樣做，小事上或許吉利，但長遠來看，或在大事上，則有凶險。",
+        "乘馬班如，泣血漣如。": "騎著馬在原地打轉，無法前進，悲傷到泣血不止。表示處境極度艱難，進退兩難。",
+        "發蒙，利用刑人，用說桎梏，以往吝。": "啟發蒙昧，最好使用像刑罰一樣嚴格的紀律，來解除思想上的枷鎖。但如果一直這樣嚴格下去，就會有問題。",
+        "包蒙吉，納婦吉，子克家。": "包容、耐心地對待蒙昧的初學者是吉利的。就像娶妻一樣，兒子也能夠承擔家業。",
+        "勿用取女，見金夫，不有躬，無攸利。": "不要娶這樣的女子，她見到有錢的男人，就無法把持自己，娶了她沒有任何好處。",
+        "困蒙，吝。": "被蒙昧所困，無法擺脫，這是很糟糕的。",
+        "童蒙，吉。": "像孩童一樣，以謙虛、純真的態度去學習，是吉利的。",
+        "擊蒙，不利為寇，利禦寇。": "對待蒙昧，可以用敲打的方式來啟發，但不宜過於粗暴，像強盜一樣。防禦性的、適度的懲戒才是合適的。",
+        "需于郊，利用恆，無咎。": "在郊外等待，這時候需要有恆心，堅持下去，就不會有災禍。",
+        "需于沙，小有言，終吉。": "在沙灘上等待，雖然會有一些小的口舌是非，但最終結果是吉利的。",
+        "需于泥，致寇至。": "在泥濘中等待，這會招致盜賊前來。表示處境危險，要小心防範。",
+        "需于血，出自穴。": "在血泊中等待，這是極度危險的境地。但最終能夠從險境中走出來。",
+        "需于酒食，貞吉。": "在酒食宴樂中等待，這表示時機即將到來，堅守正道，結果是吉利的。",
+        "入于穴，有不速之客三人來，敬之終吉。": "進入洞穴中等待，有三位不請自來的客人。恭敬地對待他們，最終會是吉利的。"
+    };
+
+    // =========================================================================
     // 模擬占卜與整合分析的核心邏輯
     // =========================================================================
 
-    /**
-     * 模擬易經占卜過程，產生卦象與變爻
-     * @returns {{hexagram: object, changingLine: number}}
-     */
+    function getContrastingTextColor(hexColor) {
+        if (hexColor.startsWith('#')) {
+            hexColor = hexColor.slice(1);
+        }
+        const r = parseInt(hexColor.substring(0, 2), 16);
+        const g = parseInt(hexColor.substring(2, 4), 16);
+        const b = parseInt(hexColor.substring(4, 6), 16);
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        return brightness > 128 ? '#000000' : '#FFFFFF';
+    }
+
     function simulateIChing() {
-        // 為了簡化並確保每次都有明確的指引，我們直接隨機選定一卦和一變爻
         const hexagramNumber = Math.floor(Math.random() * 64) + 1;
-        const changingLine = Math.floor(Math.random() * 6); // 0-5 for the line index
+        const changingLine = Math.floor(Math.random() * 6);
+        const hexagram = iChingData[hexagramNumber];
+        if (!hexagram) { // Safety Check
+            console.error(`Invalid hexagram number: ${hexagramNumber}`);
+            return null;
+        }
         return {
-            hexagram: iChingData[hexagramNumber],
+            hexagramNumber: hexagramNumber,
+            hexagram: hexagram,
             changingLine: changingLine
         };
     }
 
-    /**
-     * 從Aztro API獲取每日星座運勢
-     * @returns {Promise<object|null>}
-     */
     async function fetchAstrology() {
         try {
             const response = await fetch('https://aztro.sameerkumar.website/?sign=pisces&day=today', {
@@ -115,27 +181,39 @@ document.addEventListener('DOMContentLoaded', function() {
             return await response.json();
         } catch (error) {
             console.error("無法獲取星座運勢:", error);
-            return null; // 如果API失敗，返回null
+            return null;
         }
     }
 
-    /**
-     * 整合所有資訊，產生最終的分析報告
-     * @param {object} astroData - 星座運勢數據
-     * @param {object} iChingResult - 易經占卜結果
-     * @returns {string} - 格式化後的HTML報告
-     */
     function generateGrandAnalysis(astroData, iChingResult) {
-        const { hexagram, changingLine } = iChingResult;
-        const yaoCi = hexagram.lines[changingLine];
+        if (!iChingResult || !iChingResult.hexagram) {
+            return `<p>抱歉，今日的易經智慧暫時無法連接，請稍後再試。</p>`;
+        }
 
-        // 如果API失敗，提供一個備用標題
+        const { hexagramNumber, hexagram, changingLine } = iChingResult;
+        const yaoCi = hexagram.lines[changingLine];
+        const yaoCiExplanation = yaoCiExplanations[yaoCi] || "此爻辭的智慧，在於體會其文字的意境，而非固定的解釋。";
+
+        const palaceGua = iChingPalace[hexagramNumber];
+        const dailyColor = guaColors[palaceGua];
+        let themeColorHex = dailyColor.hex;
+
+        if (themeColorHex === '#2C3539') {
+            themeColorHex = '#FFFFFF';
+        }
+        
+        window.dailyThemeColor = themeColorHex; // Store color globally
+        document.documentElement.style.setProperty('--theme-color', themeColorHex);
+
+        const luckyColorName = dailyColor.name;
+        const luckyColorHex = dailyColor.hex;
+        const textColor = getContrastingTextColor(luckyColorHex);
+
         const astroTheme = astroData ? astroData.description : "今日的宇宙能量提醒我們關注內在的成長與變化。";
-        const luckyColor = astroData ? astroData.color : "任何讓您感到平靜的顏色";
 
         return `
-            <p style="text-align: center; color: #606770; border-bottom: 1px solid #dddfe2; padding-bottom: 15px;">
-                <strong>幸運色:</strong> <span style="background-color: #f0f2f5; padding: 3px 10px; border-radius: 5px;">${luckyColor}</span> | 
+            <p style="text-align: center; color: #a0a0a0; border-bottom: 1px solid #333; padding-bottom: 15px;">
+                <strong>幸運色:</strong> <span style="background-color: ${luckyColorHex}; color: ${textColor}; padding: 3px 10px; border-radius: 5px; font-weight: bold;">${luckyColorName}</span> | 
                 <strong>今日卦象:</strong> ${hexagram.name}
             </p>
 
@@ -148,21 +226,17 @@ document.addEventListener('DOMContentLoaded', function() {
             <h4><strong>策略：易經的智慧箴言</strong></h4>
             <p>針對今日的能量主題，易經為您指引的策略核心，來自 <strong>${hexagram.name}卦</strong> 的第 <strong>${changingLine + 1}</strong> 爻，其爻辭為：</p>
             <p class="yao-ci">「${yaoCi}」</p>
+            <p style="font-style: italic; color: #c0c0c0;"><strong>爻辭淺釋：</strong>${yaoCiExplanation}</p>
             
             <h4><strong>綜合建議：今日的行動方案</strong></h4>
             <p>${interpret(astroTheme, zwdsProfile, hexagram.name, yaoCi)}</p>
         `;
     }
     
-    /**
-     * 根據所有資訊，產生綜合性的解釋
-     * 這是一個簡化的解釋模型，實際應用中可以更複雜
-     */
     function interpret(astroTheme, zwdsProfile, hexagramName, yaoCi) {
         let advice = `綜合來看，今天星象所提示的「${astroTheme.substring(0, 20)}...」主題，正好與您命盤中「${zwdsProfile.mainStars}」所代表的思辨與溝通特質息息相關。`;
         advice += `在此情境下，易經 ${hexagramName} 卦的「${yaoCi}」爻辭，為您提供了最精準的行動指南。`;
         
-        // 根據爻辭的關鍵字給出非常簡化的建議
         if (yaoCi.includes("吉") || yaoCi.includes("利")) {
             advice += "這是一個積極的信號，暗示您今天的行動將會順利。請相信您的直覺與判斷，勇敢地朝著目標前進。您的溝通能力將是成功的關鍵，善用您的口才去說服他人，將無往不利。";
         } else if (yaoCi.includes("凶") || yaoCi.includes("吝")) {
@@ -176,21 +250,23 @@ document.addEventListener('DOMContentLoaded', function() {
         return advice;
     }
 
-
-    // =========================================================================
-    // 程式執行入口
-    // =========================================================================
     async function initialize() {
         const fortuneContainer = document.getElementById('fortune-content');
         if (!fortuneContainer) return;
 
-        fortuneContainer.innerHTML = "<p>正在為您連接宇宙的智慧，請稍候...</p>";
+        try {
+            fortuneContainer.innerHTML = "<p>正在為您連接宇宙的智慧，請稍候...</p>";
 
-        const iChingResult = simulateIChing();
-        const astroData = await fetchAstrology();
-        
-        const analysisHTML = generateGrandAnalysis(astroData, iChingResult);
-        fortuneContainer.innerHTML = analysisHTML;
+            const iChingResult = simulateIChing();
+            const astroData = await fetchAstrology();
+            
+            const analysisHTML = generateGrandAnalysis(astroData, iChingResult);
+            fortuneContainer.innerHTML = analysisHTML;
+
+        } catch (error) {
+            console.error("生成運勢時發生錯誤:", error);
+            fortuneContainer.innerHTML = "<p>抱歉，系統發生未知錯誤，今日的智慧暫時迷路了。請稍後再試一次。</p>";
+        }
     }
 
     initialize();
