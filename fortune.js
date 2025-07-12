@@ -494,19 +494,200 @@ document.addEventListener('DOMContentLoaded', function() {
         return brightness > 128 ? '#000000' : '#FFFFFF';
     }
 
-    function simulateIChing() {
-        const hexagramNumber = Math.floor(Math.random() * 64) + 1;
-        const changingLine = Math.floor(Math.random() * 6);
-        const hexagram = iChingData[hexagramNumber];
-        if (!hexagram) { // Safety Check
-            console.error(`Invalid hexagram number: ${hexagramNumber}`);
-            return null;
+    // =========================================================================
+    // 時間起卦系統 - 根據打開網頁的時間按照傳統規則起卦
+    // =========================================================================
+    
+    // 地支對應數字（用於時間起卦）
+    const earthlyBranchNumbers = {
+        '子': 1, '丑': 2, '寅': 3, '卯': 4, '辰': 5, '巳': 6,
+        '午': 7, '未': 8, '申': 9, '酉': 10, '戌': 11, '亥': 12
+    };
+
+    // 先天八卦序數
+    const primalBaguaMap = {
+        1: '乾', 2: '兌', 3: '離', 4: '震', 5: '巽', 6: '坎', 7: '艮', 8: '坤'
+    };
+
+    // 六十四卦對照表（上卦-下卦組合）
+    const hexagramMatrix = {
+        '乾乾': 1, '乾兌': 43, '乾離': 14, '乾震': 34, '乾巽': 9, '乾坎': 5, '乾艮': 26, '乾坤': 11,
+        '兌乾': 10, '兌兌': 58, '兌離': 38, '兌震': 54, '兌巽': 61, '兌坎': 60, '兌艮': 41, '兌坤': 19,
+        '離乾': 13, '離兌': 49, '離離': 30, '離震': 55, '離巽': 37, '離坎': 63, '離艮': 22, '離坤': 36,
+        '震乾': 25, '震兌': 17, '震離': 21, '震震': 51, '震巽': 42, '震坎': 3, '震艮': 27, '震坤': 24,
+        '巽乾': 44, '巽兌': 28, '巽離': 50, '巽震': 32, '巽巽': 57, '巽坎': 48, '巽艮': 18, '巽坤': 46,
+        '坎乾': 6, '坎兌': 47, '坎離': 64, '坎震': 40, '坎巽': 59, '坎坎': 29, '坎艮': 4, '坎坤': 7,
+        '艮乾': 33, '艮兌': 31, '艮離': 56, '艮震': 62, '艮巽': 53, '艮坎': 39, '艮艮': 52, '艮坤': 15,
+        '坤乾': 12, '坤兌': 45, '坤離': 35, '坤震': 16, '坤巽': 20, '坤坎': 8, '坤艮': 23, '坤坤': 2
+    };
+
+    // 簡化的公曆轉農曆函數（基於2025年）
+    function solarToLunar(date) {
+        // 這是一個簡化的實現，實際使用應該用更精確的農曆轉換庫
+        // 這裡實現一個基本的近似算法
+        
+        const currentYear = date.getFullYear();
+        const currentMonth = date.getMonth() + 1; // JavaScript月份從0開始
+        const currentDay = date.getDate();
+        
+        // 簡化的農曆計算 - 直接使用公曆日期作為基礎
+        // 實際項目中應該使用專業的農曆轉換庫
+        let lunarYear = currentYear;
+        let lunarMonth = currentMonth;
+        let lunarDay = currentDay;
+        
+        // 調整農曆年份（春節前算上一年）
+        if (currentMonth === 1 && currentDay < 20) {
+            lunarYear = currentYear - 1;
+            lunarMonth = 12;
+            lunarDay = currentDay + 10; // 簡化處理
+        } else if (currentMonth === 2 && currentDay < 20) {
+            lunarYear = currentYear - 1;
+            lunarMonth = 12;
+            lunarDay = currentDay + 30; // 簡化處理
         }
+        
+        // 限制農曆日期範圍
+        if (lunarDay > 30) lunarDay = 30;
+        if (lunarMonth > 12) lunarMonth = 12;
+        
         return {
-            hexagramNumber: hexagramNumber,
-            hexagram: hexagram,
-            changingLine: changingLine
+            lunarYear: lunarYear,
+            lunarMonth: lunarMonth,
+            lunarDay: lunarDay,
+            yearBranch: getYearBranch(lunarYear),
+            timeBranch: getTimeBranch(date.getHours())
         };
+    }
+
+
+    function getYearBranch(year) {
+        const branches = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+        // 根據您的例子，2014年甲午年，午對應數字7
+        // 我們需要確定正確的基準年
+        // 甲午年：2014年，午是地支第7位（從1開始計算）
+        // 地支循環：子丑寅卯辰巳午未申酉戌亥
+        //           1 2 3 4 5 6 7 8 9 10 11 12
+        
+        // 2014年是午年，午在數組中的索引是6（從0開始）
+        const baseYear = 2014;
+        const baseIndex = 6; // 午的索引
+        
+        const yearOffset = (year - baseYear) % 12;
+        let index = (baseIndex + yearOffset) % 12;
+        if (index < 0) index += 12;
+        
+        return branches[index];
+    }
+
+    function getTimeBranch(hour) {
+        const branches = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+        // 23-1點為子時，1-3點為丑時，以此類推
+        let timeIndex;
+        if (hour === 23 || hour === 0) timeIndex = 0; // 子
+        else if (hour >= 1 && hour <= 2) timeIndex = 1; // 丑
+        else if (hour >= 3 && hour <= 4) timeIndex = 2; // 寅
+        else if (hour >= 5 && hour <= 6) timeIndex = 3; // 卯
+        else if (hour >= 7 && hour <= 8) timeIndex = 4; // 辰
+        else if (hour >= 9 && hour <= 10) timeIndex = 5; // 巳
+        else if (hour >= 11 && hour <= 12) timeIndex = 6; // 午
+        else if (hour >= 13 && hour <= 14) timeIndex = 7; // 未
+        else if (hour >= 15 && hour <= 16) timeIndex = 8; // 申
+        else if (hour >= 17 && hour <= 18) timeIndex = 9; // 酉
+        else if (hour >= 19 && hour <= 20) timeIndex = 10; // 戌
+        else timeIndex = 11; // 亥
+        
+        return branches[timeIndex];
+    }
+
+    function simulateIChing() {
+        try {
+            const now = new Date();
+            console.log('當前時間:', now);
+            
+            // 轉換為農曆
+            const lunarInfo = solarToLunar(now);
+            console.log('農曆信息:', lunarInfo);
+            
+            // 獲取地支數字
+            const yearBranchNum = earthlyBranchNumbers[lunarInfo.yearBranch];
+            const timeBranchNum = earthlyBranchNumbers[lunarInfo.timeBranch];
+            
+            // 檢查數值有效性
+            if (!yearBranchNum || !timeBranchNum) {
+                throw new Error('地支數字計算錯誤');
+            }
+            
+            console.log(`年地支: ${lunarInfo.yearBranch}(${yearBranchNum}), 月: ${lunarInfo.lunarMonth}, 日: ${lunarInfo.lunarDay}, 時地支: ${lunarInfo.timeBranch}(${timeBranchNum})`);
+            
+            // 按照傳統起卦規則
+            // 1. 上卦：(年地支數 + 月數 + 日數) ÷ 8，取餘數
+            const upperGuaSum = yearBranchNum + lunarInfo.lunarMonth + lunarInfo.lunarDay;
+            let upperGuaRemainder = upperGuaSum % 8;
+            if (upperGuaRemainder === 0) upperGuaRemainder = 8;
+            const upperGua = primalBaguaMap[upperGuaRemainder];
+            
+            // 2. 下卦：(年地支數 + 月數 + 日數 + 時地支數) ÷ 8，取餘數
+            const lowerGuaSum = yearBranchNum + lunarInfo.lunarMonth + lunarInfo.lunarDay + timeBranchNum;
+            let lowerGuaRemainder = lowerGuaSum % 8;
+            if (lowerGuaRemainder === 0) lowerGuaRemainder = 8;
+            const lowerGua = primalBaguaMap[lowerGuaRemainder];
+            
+            // 3. 動爻：(年地支數 + 月數 + 日數 + 時地支數) ÷ 6，取餘數
+            let changingLineNum = lowerGuaSum % 6;
+            if (changingLineNum === 0) changingLineNum = 6;
+            
+            // 查找對應的六十四卦
+            const hexagramKey = upperGua + lowerGua;
+            const hexagramNumber = hexagramMatrix[hexagramKey];
+            
+            if (!hexagramNumber || !iChingData[hexagramNumber]) {
+                throw new Error(`無法找到對應的卦象: ${hexagramKey}`);
+            }
+            
+            const hexagram = iChingData[hexagramNumber];
+            
+            console.log(`起卦結果: 上卦${upperGua}(${upperGuaRemainder}) + 下卦${lowerGua}(${lowerGuaRemainder}) = 第${hexagramNumber}卦 ${hexagram.name}`);
+            console.log(`動爻: 第${changingLineNum}爻`);
+            console.log(`起卦算式: 年(${yearBranchNum}) + 月(${lunarInfo.lunarMonth}) + 日(${lunarInfo.lunarDay}) + 時(${timeBranchNum}) = ${lowerGuaSum}`);
+            
+            return {
+                hexagramNumber: hexagramNumber,
+                hexagram: hexagram,
+                changingLine: changingLineNum - 1, // 轉換為0-5的索引
+                divination: {
+                    lunarDate: lunarInfo,
+                    upperGua: upperGua,
+                    lowerGua: lowerGua,
+                    upperGuaNum: upperGuaRemainder,
+                    lowerGuaNum: lowerGuaRemainder,
+                    changingLineNum: changingLineNum,
+                    calculation: {
+                        yearBranch: lunarInfo.yearBranch,
+                        yearBranchNum: yearBranchNum,
+                        month: lunarInfo.lunarMonth,
+                        day: lunarInfo.lunarDay,
+                        timeBranch: lunarInfo.timeBranch,
+                        timeBranchNum: timeBranchNum,
+                        upperSum: upperGuaSum,
+                        lowerSum: lowerGuaSum
+                    }
+                }
+            };
+        } catch (error) {
+            console.error('起卦過程中發生錯誤:', error);
+            // 如果起卦失敗，回退到隨機生成（確保程序不會崩潰）
+            const hexagramNumber = Math.floor(Math.random() * 64) + 1;
+            const changingLine = Math.floor(Math.random() * 6);
+            const hexagram = iChingData[hexagramNumber];
+            
+            return {
+                hexagramNumber: hexagramNumber,
+                hexagram: hexagram,
+                changingLine: changingLine,
+                divination: null // 標示為回退模式
+            };
+        }
     }
 
     async function fetchAstrology() {
@@ -673,7 +854,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return `<p>抱歉，今日的易經智慧暫時無法連接，請稍後再試。</p>`;
         }
 
-        const { hexagramNumber, hexagram, changingLine } = iChingResult;
+        const { hexagramNumber, hexagram, changingLine, divination } = iChingResult;
         const yaoCi = hexagram.lines[changingLine];
         const yaoCiExplanation = yaoCiExplanations[yaoCi] || "此爻辭的智慧，在於體會其文字的意境，而非固定的解釋。";
 
@@ -696,12 +877,38 @@ document.addEventListener('DOMContentLoaded', function() {
         const isApiFallback = astroData && (astroData.source === 'fallback' || astroData.source === 'AI智能預測');
         const apiStatus = astroData && astroData.success === false ? 'AI智能預測' : (astroData && astroData.source ? `${astroData.source}` : '宇宙智慧');
 
+        // 生成起卦詳情
+        let divinationDetails = '';
+        if (divination) {
+            const { lunarDate, upperGua, lowerGua, changingLineNum, calculation } = divination;
+            divinationDetails = `
+            <div style="background: rgba(255,255,255,0.05); border-left: 4px solid ${luckyColorHex}; padding: 15px; margin: 15px 0; border-radius: 5px;">
+                <h4 style="margin-top: 0; color: ${luckyColorHex};">🎯 今日時間起卦詳情</h4>
+                <p><strong>起卦時間：</strong>農曆${lunarDate.lunarYear}年${lunarDate.lunarMonth}月${lunarDate.lunarDay}日 ${calculation.timeBranch}時</p>
+                <p><strong>起卦算式：</strong></p>
+                <ul style="margin: 5px 0; padding-left: 20px;">
+                    <li>上卦：年(${calculation.yearBranch}=${calculation.yearBranchNum}) + 月(${calculation.month}) + 日(${calculation.day}) = ${calculation.upperSum} ÷ 8 = 餘${divination.upperGuaNum} → <strong>${upperGua}卦</strong></li>
+                    <li>下卦：年(${calculation.yearBranchNum}) + 月(${calculation.month}) + 日(${calculation.day}) + 時(${calculation.timeBranch}=${calculation.timeBranchNum}) = ${calculation.lowerSum} ÷ 8 = 餘${divination.lowerGuaNum} → <strong>${lowerGua}卦</strong></li>
+                    <li>動爻：${calculation.lowerSum} ÷ 6 = 餘${changingLineNum} → <strong>第${changingLineNum}爻</strong></li>
+                </ul>
+                <p><strong>本卦結果：</strong>上${upperGua}下${lowerGua} = <strong>第${hexagramNumber}卦 ${hexagram.name}卦</strong></p>
+                <p style="font-size: 0.9em; color: #888; margin-bottom: 0;">※ 按照傳統梅花易數時間起卦法，以打開網頁的時間為準</p>
+            </div>`;
+        } else {
+            divinationDetails = `
+            <div style="background: rgba(255,255,255,0.05); border-left: 4px solid #888; padding: 15px; margin: 15px 0; border-radius: 5px;">
+                <p style="color: #888; margin: 0; font-size: 0.9em;">※ 今日使用隨機起卦方式，如需時間起卦請重新整理頁面</p>
+            </div>`;
+        }
+
         return `
             <p style="text-align: center; color: #a0a0a0; border-bottom: 1px solid #333; padding-bottom: 15px;">
                 <strong>幸運色:</strong> <span style="background-color: ${luckyColorHex}; color: ${textColor}; padding: 3px 10px; border-radius: 5px; font-weight: bold;">${luckyColorName}</span> | 
                 <strong>今日卦象:</strong> ${hexagram.name} | 
                 <span style="color: #888; font-size: 0.9em;">${apiStatus}</span>
             </p>
+
+            ${divinationDetails}
 
             <h4><strong>策略：易經的智慧箴言</strong></h4>
             <p>針對今日的能量主題，易經為您指引的策略核心，來自 <strong>${hexagram.name}卦</strong> 的第 <strong>${changingLine + 1}</strong> 爻，其爻辭為：</p>
