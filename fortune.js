@@ -521,63 +521,16 @@ document.addEventListener('DOMContentLoaded', function() {
         '坤乾': 12, '坤兌': 45, '坤離': 35, '坤震': 16, '坤巽': 20, '坤坎': 8, '坤艮': 23, '坤坤': 2
     };
 
-    // 簡化的公曆轉農曆函數（基於2025年）
+    // 使用 lunar-javascript 進行精確轉換
     function solarToLunar(date) {
-        // 這是一個簡化的實現，實際使用應該用更精確的農曆轉換庫
-        // 這裡實現一個基本的近似算法
-        
-        const currentYear = date.getFullYear();
-        const currentMonth = date.getMonth() + 1; // JavaScript月份從0開始
-        const currentDay = date.getDate();
-        
-        // 簡化的農曆計算 - 直接使用公曆日期作為基礎
-        // 實際項目中應該使用專業的農曆轉換庫
-        let lunarYear = currentYear;
-        let lunarMonth = currentMonth;
-        let lunarDay = currentDay;
-        
-        // 調整農曆年份（春節前算上一年）
-        if (currentMonth === 1 && currentDay < 20) {
-            lunarYear = currentYear - 1;
-            lunarMonth = 12;
-            lunarDay = currentDay + 10; // 簡化處理
-        } else if (currentMonth === 2 && currentDay < 20) {
-            lunarYear = currentYear - 1;
-            lunarMonth = 12;
-            lunarDay = currentDay + 30; // 簡化處理
-        }
-        
-        // 限制農曆日期範圍
-        if (lunarDay > 30) lunarDay = 30;
-        if (lunarMonth > 12) lunarMonth = 12;
-        
+        const lunar = Lunar.fromDate(date);
         return {
-            lunarYear: lunarYear,
-            lunarMonth: lunarMonth,
-            lunarDay: lunarDay,
-            yearBranch: getYearBranch(lunarYear),
+            lunarYear: lunar.getYear(),
+            lunarMonth: lunar.getMonth(),
+            lunarDay: lunar.getDay(),
+            yearBranch: lunar.getYearInGanZhi().substring(1, 2),
             timeBranch: getTimeBranch(date.getHours())
         };
-    }
-
-
-    function getYearBranch(year) {
-        const branches = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
-        // 根據您的例子，2014年甲午年，午對應數字7
-        // 我們需要確定正確的基準年
-        // 甲午年：2014年，午是地支第7位（從1開始計算）
-        // 地支循環：子丑寅卯辰巳午未申酉戌亥
-        //           1 2 3 4 5 6 7 8 9 10 11 12
-        
-        // 2014年是午年，午在數組中的索引是6（從0開始）
-        const baseYear = 2014;
-        const baseIndex = 6; // 午的索引
-        
-        const yearOffset = (year - baseYear) % 12;
-        let index = (baseIndex + yearOffset) % 12;
-        if (index < 0) index += 12;
-        
-        return branches[index];
     }
 
     function getTimeBranch(hour) {
