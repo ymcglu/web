@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
+    console.log("🚀 Fortune.js 載入時間:", new Date().toLocaleString(), "- 多重代理版本 v2.0");
 
     // =========================================================================
     // TIER 1: 紫微斗數核心命盤分析 (The Why - 您的根基)
