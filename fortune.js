@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded', function() {
-    console.log("🚀 Fortune.js 載入時間:", new Date().toLocaleString(), "- 多重代理版本 v2.1 緩存清除");
+    console.log("🚀 Fortune.js 載入完成:", new Date().toLocaleString());
 
     // =========================================================================
-    // TIER 1: 紫微斗數核心命盤分析 (The Why - 您的根基)
+    // 紫微斗數核心命盤分析
     // =========================================================================
     const zwdsProfile = {
         lifePalace: "命宮在寅",
@@ -10,12 +10,8 @@ document.addEventListener('DOMContentLoaded', function() {
         analysis: "您的命宮主星為「天機」與「巨門」，這代表您擁有極高的智慧、卓越的思考與分析能力，以及出色的口才與溝通技巧。天機星賦予您善良、敏銳的觀察力與強大的學習能力，對任何事物都有深入研究的興趣。巨門星則讓您具備雄辯的口才與追根究柢的精神，凡事都要求真、求實。這兩顆星的組合，使您成為一個天生的策略家、分析師或諮商師。然而，這也可能帶來思慮過度、內心敏感、以及有時言語過於直接的挑戰。您的核心人生課題，在於如何善用您強大的思辨能力來洞察事物，同時保持內心的平和，並用溫和而有智慧的方式與世界溝通。"
     };
 
-
-
-
-
     // =========================================================================
-    // 模擬占卜與整合分析的核心邏輯
+    // 核心功能函數
     // =========================================================================
 
     function getContrastingTextColor(hexColor) {
@@ -30,10 +26,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // =========================================================================
-    // 時間起卦系統 - 根據打開網頁的時間按照傳統規則起卦
+    // 易經時間起卦系統
     // =========================================================================
 
-    // 使用 lunar-javascript 進行精確轉換
+    // 陽曆轉農曆（使用 lunar-javascript 庫）
     function solarToLunar(date) {
         const lunar = Lunar.fromDate(date);
         return {
@@ -47,45 +43,41 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function getTimeBranch(hour) {
         const branches = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
-        // 23-1點為子時，1-3點為丑時，以此類推
         let timeIndex;
-        if (hour === 23 || hour === 0) timeIndex = 0; // 子
-        else if (hour >= 1 && hour <= 2) timeIndex = 1; // 丑
-        else if (hour >= 3 && hour <= 4) timeIndex = 2; // 寅
-        else if (hour >= 5 && hour <= 6) timeIndex = 3; // 卯
-        else if (hour >= 7 && hour <= 8) timeIndex = 4; // 辰
-        else if (hour >= 9 && hour <= 10) timeIndex = 5; // 巳
-        else if (hour >= 11 && hour <= 12) timeIndex = 6; // 午
-        else if (hour >= 13 && hour <= 14) timeIndex = 7; // 未
-        else if (hour >= 15 && hour <= 16) timeIndex = 8; // 申
-        else if (hour >= 17 && hour <= 18) timeIndex = 9; // 酉
-        else if (hour >= 19 && hour <= 20) timeIndex = 10; // 戌
-        else timeIndex = 11; // 亥
+        
+        if (hour === 23 || hour === 0) timeIndex = 0; // 子時 (23-1點)
+        else if (hour >= 1 && hour <= 2) timeIndex = 1; // 丑時
+        else if (hour >= 3 && hour <= 4) timeIndex = 2; // 寅時
+        else if (hour >= 5 && hour <= 6) timeIndex = 3; // 卯時
+        else if (hour >= 7 && hour <= 8) timeIndex = 4; // 辰時
+        else if (hour >= 9 && hour <= 10) timeIndex = 5; // 巳時
+        else if (hour >= 11 && hour <= 12) timeIndex = 6; // 午時
+        else if (hour >= 13 && hour <= 14) timeIndex = 7; // 未時
+        else if (hour >= 15 && hour <= 16) timeIndex = 8; // 申時
+        else if (hour >= 17 && hour <= 18) timeIndex = 9; // 酉時
+        else if (hour >= 19 && hour <= 20) timeIndex = 10; // 戌時
+        else timeIndex = 11; // 亥時
         
         return branches[timeIndex];
     }
 
+    // 易經時間起卦核心邏輯
     function simulateIChing() {
         try {
             const now = new Date();
-            console.log('當前時間:', now);
             
             // 轉換為農曆
             const lunarInfo = solarToLunar(now);
-            console.log('農曆信息:', lunarInfo);
             
-            // 獲取地支數字
+            // 獲取地支對應數字
             const yearBranchNum = earthlyBranchNumbers[lunarInfo.yearBranch];
             const timeBranchNum = earthlyBranchNumbers[lunarInfo.timeBranch];
             
-            // 檢查數值有效性
             if (!yearBranchNum || !timeBranchNum) {
                 throw new Error('地支數字計算錯誤');
             }
             
-            console.log(`年地支: ${lunarInfo.yearBranch}(${yearBranchNum}), 月: ${lunarInfo.lunarMonth}, 日: ${lunarInfo.lunarDay}, 時地支: ${lunarInfo.timeBranch}(${timeBranchNum})`);
-            
-            // 按照傳統起卦規則
+            // 傳統梅花易數起卦法
             // 1. 上卦：(年地支數 + 月數 + 日數) ÷ 8，取餘數
             const upperGuaSum = yearBranchNum + lunarInfo.lunarMonth + lunarInfo.lunarDay;
             let upperGuaRemainder = upperGuaSum % 8;
@@ -112,10 +104,6 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const hexagram = iChingData[hexagramNumber];
             
-            console.log(`起卦结果: 上卦${upperGua}(${upperGuaRemainder}) + 下卦${lowerGua}(${lowerGuaRemainder}) = 第${hexagramNumber}卦 ${hexagram.name}`);
-            console.log(`動爻: 第${changingLineNum}爻`);
-            console.log(`起卦算式: 年(${yearBranchNum}) + 月(${lunarInfo.lunarMonth}) + 日(${lunarInfo.lunarDay}) + 時(${timeBranchNum}) = ${lowerGuaSum}`);
-            
             return {
                 hexagramNumber: hexagramNumber,
                 hexagram: hexagram,
@@ -140,8 +128,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             };
         } catch (error) {
-            console.error('起卦過程中發生錯誤:', error);
-            // 如果起卦失敗，回退到隨機生成（確保程序不會崩潰）
+            // 如果起卦失敗，回退到隨機生成
             const hexagramNumber = Math.floor(Math.random() * 64) + 1;
             const changingLine = Math.floor(Math.random() * 6);
             const hexagram = iChingData[hexagramNumber];
@@ -155,87 +142,66 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-async function fetchFromHoroscopeApp() {
-    const apiUrl = 'https://horoscope-app-api.vercel.app/api/v1/get-horoscope/daily?sign=pisces&day=today';
-    
-    // 多個 CORS 代理服務備選
-    const corsProxies = [
-        'https://corsproxy.io/?',
-        'https://api.allorigins.win/get?url=',
-        'https://cors-anywhere.herokuapp.com/',
-        'https://proxy.cors.sh/'
-    ];
-    
-    for (let i = 0; i < corsProxies.length; i++) {
-        try {
-            console.log(`🌟 嘗試代理 ${i + 1}/${corsProxies.length}: ${corsProxies[i]}`);
-            
-            let response;
-            let data;
-            
-            if (corsProxies[i].includes('allorigins')) {
-                // allorigins 需要特殊處理
-                response = await fetch(corsProxies[i] + encodeURIComponent(apiUrl));
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                const result = await response.json();
-                data = JSON.parse(result.contents);
-            } else {
-                // 其他代理直接返回原始數據
-                response = await fetch(corsProxies[i] + encodeURIComponent(apiUrl));
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                data = await response.json();
-            }
-            
-            console.log("✅ 成功獲取 API 資料:", data);
-            
-            return {
-                description: data.data?.horoscope_data || '星象能量今日特別活躍',
-                source: `Horoscope App API (via ${corsProxies[i].split('/')[2]})`,
-                success: true
-            };
-            
-        } catch (error) {
-            console.log(`⚠️ 代理 ${i + 1} 失敗:`, error.message);
-            if (i === corsProxies.length - 1) {
-                throw new Error('所有 CORS 代理都失敗了');
+    // =========================================================================
+    // 星座運勢 API 系統
+    // =========================================================================
+
+    // 多重 CORS 代理服務，確保 API 可用性
+    async function fetchFromHoroscopeApp() {
+        const apiUrl = 'https://horoscope-app-api.vercel.app/api/v1/get-horoscope/daily?sign=pisces&day=today';
+        
+        // 多個 CORS 代理服務備選
+        const corsProxies = [
+            'https://corsproxy.io/?',
+            'https://api.allorigins.win/get?url=',
+            'https://cors-anywhere.herokuapp.com/',
+            'https://proxy.cors.sh/'
+        ];
+        
+        for (let i = 0; i < corsProxies.length; i++) {
+            try {
+                let response;
+                let data;
+                
+                if (corsProxies[i].includes('allorigins')) {
+                    // allorigins 需要特殊處理
+                    response = await fetch(corsProxies[i] + encodeURIComponent(apiUrl));
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    const result = await response.json();
+                    data = JSON.parse(result.contents);
+                } else {
+                    // 其他代理直接返回原始數據
+                    response = await fetch(corsProxies[i] + encodeURIComponent(apiUrl));
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    data = await response.json();
+                }
+                
+                return {
+                    description: data.data?.horoscope_data || '星象能量今日特別活躍',
+                    source: `Horoscope App API (via ${corsProxies[i].split('/')[2]})`,
+                    success: true
+                };
+                
+            } catch (error) {
+                if (i === corsProxies.length - 1) {
+                    throw new Error('所有 CORS 代理都失敗了');
+                }
             }
         }
     }
-}
 
-
-    // 註解掉失效的 API 函數
-    /*
-    async function fetchFromAztro() {
-        // Aztro API 已失效，暫時停用
-    }
-
-    async function fetchFromAnyGe() {
-        // Any.ge API 需要進一步測試，暫時停用
-    }
-    */
-
+    // 星座運勢獲取主函數
     async function fetchAstrology() {
-        console.log("開始獲取星座資訊...");
-        
-        // 只嘗試已確認可用的 API
         try {
             return await fetchFromHoroscopeApp();
         } catch (error) {
-            console.log("🌙 切換到 AI 智能預測模式");
-            
-            // 使用豐富且具體的預設內容（基於實際 API 返回的風格）
+            // API 失敗時使用智能預測模式
             const enhancedThemes = [
                 "今日雙魚座的直覺力特別敏銳，宇宙能量提醒您相信內在的聲音。適合進行創意發想和藝術創作，讓想像力帶您探索全新的靈感境界。",
-                
                 "星象顯示今天是雙魚座處理日常事務的好時機，建議早點完成工作任務，為晚上的娛樂時光做準備。與愛人計劃一次浪漫的約會或短途旅行。",
-                
                 "今日的天體配置鼓勵雙魚座專注於藝術天性的表達，是時候將腦海中醞釀已久的創意想法付諸實現，讓創造力盡情綻放。",
-                
                 "雙魚座今日適合探索內心深處的情感世界，冥想或靈性活動會帶來深刻的洞察與啟發，幫助您更了解自己的真實需求。",
-                
                 "今天的星象能量特別適合雙魚座加強人際連結，愛與理解的力量格外強大，是修復關係或深化友誼的絕佳時機。",
-                
                 "宇宙的智慧提醒雙魚座保持身心平衡，今日特別適合關注健康和自我照顧，為自己安排一些放鬆療癒的活動。"
             ];
             
@@ -249,35 +215,30 @@ async function fetchFromHoroscopeApp() {
         }
     }
 
+    // =========================================================================
+    // 主程序初始化
+    // =========================================================================
+
     initialize = () => {
         const fortuneContainer = document.getElementById('fortune-content');
         if (!fortuneContainer) return;
 
         fortuneContainer.innerHTML = "<p>正在為您連接宇宙的智慧，請稍候...</p>";
-
-        console.log("開始生成今日運勢...");
         
         const iChingResult = simulateIChing();
-        console.log("易經卦象生成完成:", iChingResult);
         
-        console.log("開始獲取星座資訊...");
         fetchAstrology()
             .then(astroData => {
-                console.log("星座資訊獲取完成:", astroData);
-                
                 const analysisHTML = generateGrandAnalysis(astroData, iChingResult);
                 fortuneContainer.innerHTML = analysisHTML;
-                
-                console.log("運勢分析生成完成");
             })
             .catch(error => {
-                console.error("獲取星座資訊時發生錯誤:", error);
                 fortuneContainer.innerHTML = "<p>抱歉，系統發生未知錯誤，今日的智慧暫時迷路了。請稍後再試一次。</p>";
             });
     }
 
     // =========================================================================
-    // 整合運勢分析結果
+    // 運勢分析生成系統
     // =========================================================================
     function generateGrandAnalysis(astroData, iChingResult) {
         if (!iChingResult || !iChingResult.hexagram) {
