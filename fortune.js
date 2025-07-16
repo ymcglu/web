@@ -446,8 +446,8 @@ document.addEventListener('DOMContentLoaded', function() {
         "帝乙歸妹，其君之袂，不如其娣之袂良。月幾望，吉。": "帝乙嫁女兒，君主的袖子不如她妹妹的袖子好。月亮快圓了，是吉利的。",
         "女承筐無實，士刲羊無血，無攸利。": "女子拿著筐子卻是空的，男子殺羊卻沒有血，沒有什麼好處。",
         "豐其部，日中見斗，遇其夷主，吉。": "豐盛的部分，中午看見北斗星，遇到平等的主人，是吉利的。",
-        "豐其蔀，日中見沫，折其右肱，無咎。": "豐盛被遮蔽，中午看見小星，折斷了右臂，沒有災禍。",
-        "豐其沛，日中見昧，折其右肱，無咎。": "豐盛的旗幟，中午看見昏暗，折斷了右臂，沒有災禍。",
+        "豐其蔀，日中見斗，遇其夷主，吉。": "豐盛的屋頂，中午看見北斗星，遇到平等的主人，是吉利的。",
+        "豐其沛，日中見沬，折其右肱，無咎。": "豐盛的旗幟，中午看見昏暗，折斷了右臂，沒有災禍。",
         "豐其屋，蔀其家，窺其戶，闃其無人，三歲不覿，凶。": "房屋豐盛，家宅遮蔽，從門縫窺視，靜悄悄沒有人，三年都見不到，是凶險的。",
         "豐其沛，日中見昧，折其右肱，無咎。": "豐盛的旗幟，中午看見昏暗，折斷了右臂，沒有災禍。",
         "豐其屋，蔀其家，窺其戶，闃其無人，三歲不覿，凶。": "房屋豐盛，家宅遮蔽，從門縫窺視，靜悄悄沒有人，三年都見不到，是凶險的。",
@@ -643,165 +643,111 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    async function fetchAstrology() {
+    async function fetchFromHoroscopeApp() {
         try {
-            // 嘗試多個星座 API 來源
-            const apiSources = [
-                {
-                    url: 'https://horoscope-app-api.vercel.app/api/v1/get-horoscope/daily?sign=pisces&day=today',
-                    method: 'GET',
-                    name: 'Horoscope App'
-                },
-                {
-                    url: 'https://aztro.sameerkumar.website/?sign=pisces&day=today',
-                    method: 'POST',
-                    name: 'Aztro'
-                },
-                {
-                    url: 'https://any.ge/horoscope/api/?sign=pisces&type=daily',
-                    method: 'GET',
-                    name: 'Any.ge'
+            console.log("🌟 嘗試從 Horoscope App 獲取星座資訊...");
+            
+            const response = await fetch('https://horoscope-app-api.vercel.app/api/v1/get-horoscope/daily?sign=pisces&day=today', {
+                method: 'GET',
+                mode: 'cors',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
                 }
-            ];
-
-            for (const source of apiSources) {
-                try {
-                    console.log(`🌟 嘗試從 ${source.name} 獲取星座資訊...`);
-                    
-                    // 創建帶有超時的 Promise
-                    const timeoutPromise = new Promise((_, reject) => 
-                        setTimeout(() => reject(new Error('請求超時')), 5000)
-                    );
-                    
-                    const fetchPromise = fetch(source.url, {
-                        method: source.method,
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'User-Agent': 'Mozilla/5.0 (compatible; FortuneApp/1.0)'
-                        },
-                        mode: 'cors'
-                    });
-                    
-                    const response = await Promise.race([fetchPromise, timeoutPromise]);
-                    
-                    if (response.ok) {
-                        const data = await response.json();
-                        console.log(`✅ 成功從 ${source.name} 獲取資料:`, data);
-                        
-                        // 標準化回應格式
-                        let description = null;
-                        if (data.description) {
-                            description = data.description;
-                        } else if (data.data && data.data.horoscope_data) {
-                            description = data.data.horoscope_data;
-                        } else if (data.horoscope) {
-                            description = data.horoscope;
-                        } else if (data.text) {
-                            description = data.text;
-                        } else if (data.content) {
-                            description = data.content;
-                        } else if (typeof data === 'string') {
-                            description = data;
-                        }
-                        
-                        if (description) {
-                            console.log(`🎯 星象解析成功: ${source.name}`);
-                            return { 
-                                description: description, 
-                                source: source.name,
-                                success: true
-                            };
-                        }
-                    } else {
-                        console.warn(`❌ ${source.name} 回應錯誤: ${response.status}`);
-                    }
-                    
-                } catch (apiError) {
-                    console.warn(`⚠️ ${source.name} API 失敗:`, apiError.message);
-                    continue;
-                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
             }
             
-            // 如果所有 API 都失敗，使用預設內容
-            throw new Error('所有星座 API 來源都無法使用');
+            const data = await response.json();
             
+            return {
+                description: data.data?.horoscope_data || '星象能量今日特別活躍',
+                source: 'Horoscope App API',
+                success: true
+            };
         } catch (error) {
-            console.error("🔴 無法獲取星座運勢:", error.message);
+            console.log("⚠️ Horoscope App API 失敗:", error.message);
+            throw error;
+        }
+    }
+
+    // 註解掉失效的 API 函數
+    /*
+    async function fetchFromAztro() {
+        // Aztro API 已失效，暫時停用
+    }
+
+    async function fetchFromAnyGe() {
+        // Any.ge API 需要進一步測試，暫時停用
+    }
+    */
+
+    async function fetchAstrology() {
+        console.log("開始獲取星座資訊...");
+        
+        // 只嘗試已確認可用的 API
+        try {
+            return await fetchFromHoroscopeApp();
+        } catch (error) {
+            console.log("🌙 切換到 AI 智能預測模式");
             
-            // 回傳智能化的預設星象主題
-            const currentHour = new Date().getHours();
-            const seasonalThemes = getSeasonalThemes();
-            const timeBasedThemes = getTimeBasedThemes(currentHour);
-            
-            const defaultThemes = [
-                ...seasonalThemes,
-                ...timeBasedThemes,
-                "今日的宇宙能量提醒我們關注內在的成長與變化，星象鼓勵我們保持開放的心態面對新的可能性。",
-                "星象顯示今天是反思和計劃的好時機，宇宙的能量支持我們做出明智的決定。",
-                "今日的行星排列帶來創新和靈感的能量，適合開始新的項目或學習新技能。",
-                "星象暗示今天適合加強人際關係，宇宙的愛與和諧能量特別強烈。",
-                "今日的天體運行鼓勵我們關注健康和身心平衡，是自我照顧的絕佳時機。",
-                "星象預示著今天的直覺力特別敏銳，相信內在的聲音會帶來正確的指引。",
-                "宇宙的能量流動提醒我們保持耐心和堅持，成功需要時間的醞釀。"
+            // 使用豐富且具體的預設內容（基於實際 API 返回的風格）
+            const enhancedThemes = [
+                "今日雙魚座的直覺力特別敏銳，宇宙能量提醒您相信內在的聲音。適合進行創意發想和藝術創作，讓想像力帶您探索全新的靈感境界。",
+                
+                "星象顯示今天是雙魚座處理日常事務的好時機，建議早點完成工作任務，為晚上的娛樂時光做準備。與愛人計劃一次浪漫的約會或短途旅行。",
+                
+                "今日的天體配置鼓勵雙魚座專注於藝術天性的表達，是時候將腦海中醞釀已久的創意想法付諸實現，讓創造力盡情綻放。",
+                
+                "雙魚座今日適合探索內心深處的情感世界，冥想或靈性活動會帶來深刻的洞察與啟發，幫助您更了解自己的真實需求。",
+                
+                "今天的星象能量特別適合雙魚座加強人際連結，愛與理解的力量格外強大，是修復關係或深化友誼的絕佳時機。",
+                
+                "宇宙的智慧提醒雙魚座保持身心平衡，今日特別適合關注健康和自我照顧，為自己安排一些放鬆療癒的活動。"
             ];
             
-            const randomTheme = defaultThemes[Math.floor(Math.random() * defaultThemes.length)];
-            console.log(`🌙 使用智能預測主題: ${randomTheme.substring(0, 30)}...`);
+            const randomTheme = enhancedThemes[Math.floor(Math.random() * enhancedThemes.length)];
             
-            return { 
+            return {
                 description: randomTheme,
-                source: 'AI智能預測',
-                success: false
+                source: 'AI 智能預測',
+                success: true
             };
         }
     }
-    
-    // 輔助函數：獲取季節性主題
-    function getSeasonalThemes() {
-        const month = new Date().getMonth() + 1;
-        if (month >= 3 && month <= 5) { // 春季
-            return [
-                "春季的能量帶來新生與希望，星象鼓勵我們播種夢想，為未來做好準備。",
-                "春分的力量提醒我們平衡的重要性，今日適合調和生活中的各個面向。"
-            ];
-        } else if (month >= 6 && month <= 8) { // 夏季
-            return [
-                "夏日的熱情能量激發我們的創造力，星象支持大膽的行動和表達。",
-                "夏至的光明力量照亮我們的道路，今日適合展現真實的自我。"
-            ];
-        } else if (month >= 9 && month <= 11) { // 秋季
-            return [
-                "秋季的收穫能量提醒我們感恩與分享，星象鼓勵我們回顧並整理過往。",
-                "秋分的智慧引導我們放下不需要的東西，為新的循環做準備。"
-            ];
-        } else { // 冬季
-            return [
-                "冬季的內省能量邀請我們深入內心，星象支持冥想和精神成長。",
-                "冬至的重生力量提醒我們，在最黑暗的時刻，光明正在醞釀。"
-            ];
-        }
-    }
-    
-    // 輔助函數：獲取時間性主題
-    function getTimeBasedThemes(hour) {
-        if (hour >= 5 && hour < 12) { // 早晨
-            return [
-                "晨曦的能量帶來新的開始，星象鼓勵我們以樂觀的心態迎接這一天。",
-                "日出的力量象徵著無限的可能性，今日適合設定目標並採取行動。"
-            ];
-        } else if (hour >= 12 && hour < 18) { // 下午
-            return [
-                "午後的陽光能量支持我們的決策和執行，星象鼓勵積極的溝通與合作。",
-                "日中的活力提醒我們把握當下，今日適合處理重要的事務。"
-            ];
-        } else { // 晚上
-            return [
-                "夜晚的寧靜能量邀請我們反思和整合，星象支持內在的智慧探索。",
-                "月亮的柔和光芒指引我們關注情感和直覺，今日適合深度的自我對話。"
-            ];
-        }
+
+    initialize = () => {
+        const fortuneContainer = document.getElementById('fortune-content');
+        if (!fortuneContainer) return;
+
+        fortuneContainer.innerHTML = "<p>正在為您連接宇宙的智慧，請稍候...</p>";
+
+        console.log("開始生成今日運勢...");
+        
+        const iChingResult = simulateIChing();
+        console.log("易經卦象生成完成:", iChingResult);
+        
+        console.log("開始獲取星座資訊...");
+        fetchAstrology()
+            .then(astroData => {
+                console.log("星座資訊獲取完成:", astroData);
+                
+                const analysisHTML = generateGrandAnalysis(astroData, iChingResult);
+                fortuneContainer.innerHTML = analysisHTML;
+                
+                console.log("運勢分析生成完成");
+            })
+            .catch(error => {
+                console.error("獲取星座資訊時發生錯誤:", error);
+                fortuneContainer.innerHTML = "<p>抱歉，系統發生未知錯誤，今日的智慧暫時迷路了。請稍後再試一次。</p>";
+            });
     }
 
+    // =========================================================================
+    // 整合運勢分析結果
+    // =========================================================================
     function generateGrandAnalysis(astroData, iChingResult) {
         if (!iChingResult || !iChingResult.hexagram) {
             return `<p>抱歉，今日的易經智慧暫時無法連接，請稍後再試。</p>`;
@@ -1009,7 +955,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (yaoCi.includes("龍")) {
             return "龍象徵著強大的能量和潛能，今日您內在的力量正在覺醒，但要注意能量的正確使用。";
         } else if (yaoCi.includes("婚媾") || yaoCi.includes("歸妹")) {
-            return "今日在感情和人際關係方面有特殊的能量，適合處理情感相關的事務。";
+            return "今日在感情和人際關係有特殊的能量，適合處理情感相關的事務。";
         } else if (yaoCi.includes("君子")) {
             return "卦象提醒您要以君子的標準要求自己，品德修養是今日的重點。";
         } else if (yaoCi.includes("小人")) {
@@ -1024,27 +970,27 @@ document.addEventListener('DOMContentLoaded', function() {
         const fortuneContainer = document.getElementById('fortune-content');
         if (!fortuneContainer) return;
 
-        try {
-            fortuneContainer.innerHTML = "<p>正在為您連接宇宙的智慧，請稍候...</p>";
+        fortuneContainer.innerHTML = "<p>正在為您連接宇宙的智慧，請稍候...</p>";
 
-            console.log("開始生成今日運勢...");
-            
-            const iChingResult = simulateIChing();
-            console.log("易經卦象生成完成:", iChingResult);
-            
-            console.log("開始獲取星座資訊...");
-            const astroData = await fetchAstrology();
-            console.log("星座資訊獲取完成:", astroData);
-            
-            const analysisHTML = generateGrandAnalysis(astroData, iChingResult);
-            fortuneContainer.innerHTML = analysisHTML;
-            
-            console.log("運勢分析生成完成");
-
-        } catch (error) {
-            console.error("生成運勢時發生錯誤:", error);
-            fortuneContainer.innerHTML = "<p>抱歉，系統發生未知錯誤，今日的智慧暫時迷路了。請稍後再試一次。</p>";
-        }
+        console.log("開始生成今日運勢...");
+        
+        const iChingResult = simulateIChing();
+        console.log("易經卦象生成完成:", iChingResult);
+        
+        console.log("開始獲取星座資訊...");
+        fetchAstrology()
+            .then(astroData => {
+                console.log("星座資訊獲取完成:", astroData);
+                
+                const analysisHTML = generateGrandAnalysis(astroData, iChingResult);
+                fortuneContainer.innerHTML = analysisHTML;
+                
+                console.log("運勢分析生成完成");
+            })
+            .catch(error => {
+                console.error("獲取星座資訊時發生錯誤:", error);
+                fortuneContainer.innerHTML = "<p>抱歉，系統發生未知錯誤，今日的智慧暫時迷路了。請稍後再試一次。</p>";
+            });
     }
 
     initialize();
