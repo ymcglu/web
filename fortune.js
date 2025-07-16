@@ -647,13 +647,10 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             console.log("🌟 嘗試從 Horoscope App 獲取星座資訊...");
             
+            // 移除可能觸發預檢請求的標頭
             const response = await fetch('https://horoscope-app-api.vercel.app/api/v1/get-horoscope/daily?sign=pisces&day=today', {
-                method: 'GET',
-                mode: 'cors',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                }
+                method: 'GET'
+                // 移除 mode: 'cors' 和自定義 headers
             });
             
             if (!response.ok) {
@@ -668,7 +665,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 success: true
             };
         } catch (error) {
-            console.log("⚠️ Horoscope App API 失敗:", error.message);
+            console.log("⚠️ Horoscope App API 受 CORS 限制:", error.message);
             throw error;
         }
     }
