@@ -155,28 +155,50 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
 async function fetchFromHoroscopeApp() {
-    try {
-        console.log("🌟 使用最簡化請求獲取星座資訊...");
-        
-        // 使用 CORS 代理來避免 CORS 問題
-        const response = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent('https://horoscope-app-api.vercel.app/api/v1/get-horoscope/daily?sign=pisces&day=today'));
-        
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    const apiUrl = 'https://horoscope-app-api.vercel.app/api/v1/get-horoscope/daily?sign=pisces&day=today';
+    
+    // 多個 CORS 代理服務備選
+    const corsProxies = [
+        'https://corsproxy.io/?',
+        'https://api.allorigins.win/get?url=',
+        'https://cors-anywhere.herokuapp.com/',
+        'https://proxy.cors.sh/'
+    ];
+    
+    for (let i = 0; i < corsProxies.length; i++) {
+        try {
+            console.log(`🌟 嘗試代理 ${i + 1}/${corsProxies.length}: ${corsProxies[i]}`);
+            
+            let response;
+            let data;
+            
+            if (corsProxies[i].includes('allorigins')) {
+                // allorigins 需要特殊處理
+                response = await fetch(corsProxies[i] + encodeURIComponent(apiUrl));
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const result = await response.json();
+                data = JSON.parse(result.contents);
+            } else {
+                // 其他代理直接返回原始數據
+                response = await fetch(corsProxies[i] + encodeURIComponent(apiUrl));
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                data = await response.json();
+            }
+            
+            console.log("✅ 成功獲取 API 資料:", data);
+            
+            return {
+                description: data.data?.horoscope_data || '星象能量今日特別活躍',
+                source: `Horoscope App API (via ${corsProxies[i].split('/')[2]})`,
+                success: true
+            };
+            
+        } catch (error) {
+            console.log(`⚠️ 代理 ${i + 1} 失敗:`, error.message);
+            if (i === corsProxies.length - 1) {
+                throw new Error('所有 CORS 代理都失敗了');
+            }
         }
-        
-        const data = await response.json();
-        const apiData = JSON.parse(data.contents); // 解析代理返回的數據
-        console.log("✅ 成功獲取 API 資料:", apiData);
-        
-        return {
-            description: apiData.data?.horoscope_data || '星象能量今日特別活躍',
-            source: 'Horoscope App API (via CORS proxy)',
-            success: true
-        };
-    } catch (error) {
-        console.log("⚠️ Horoscope App API 失敗:", error.message);
-        throw error;
     }
 }
 
