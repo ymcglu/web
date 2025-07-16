@@ -158,19 +158,20 @@ async function fetchFromHoroscopeApp() {
     try {
         console.log("🌟 使用最簡化請求獲取星座資訊...");
         
-        // 最簡化的 GET 請求，避免任何可能觸發 CORS 預檢的因素
-        const response = await fetch('https://horoscope-app-api.vercel.app/api/v1/get-horoscope/daily?sign=pisces&day=today');
+        // 使用 CORS 代理來避免 CORS 問題
+        const response = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent('https://horoscope-app-api.vercel.app/api/v1/get-horoscope/daily?sign=pisces&day=today'));
         
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
         
         const data = await response.json();
-        console.log("✅ 成功獲取 API 資料:", data);
+        const apiData = JSON.parse(data.contents); // 解析代理返回的數據
+        console.log("✅ 成功獲取 API 資料:", apiData);
         
         return {
-            description: data.data?.horoscope_data || '星象能量今日特別活躍',
-            source: 'Horoscope App API',
+            description: apiData.data?.horoscope_data || '星象能量今日特別活躍',
+            source: 'Horoscope App API (via CORS proxy)',
             success: true
         };
     } catch (error) {
