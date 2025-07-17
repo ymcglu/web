@@ -33,9 +33,9 @@
   - 平板版 (768px-1024px)：優化間距和字體
   - 手機版 (≤768px)：單欄佈局，導航置底
   - 小螢幕 (≤480px)：極致精簡化設計
-- **觸控優化** - 符合iOS 44px最小觸控目標標準
+- **觸控優化** - 符合 iOS 44px 最小觸控目標標準
 - **手勢友好** - 平滑捲動和觸控回饋
-- **PWA就緒** - 支援離線瀏覽與應用安裝
+- **PWA 就緒** - 支援離線瀏覽與應用安裝
 
 ### 🎨 動態視覺體驗
 
@@ -128,11 +128,20 @@ const corsProxies = [
 
 #### 3. 模組化資料庫結構
 
-- `earthly-branch-numbers.js` - 地支數字對照 (12 entries)
+**核心資料檔案** (位於 `/database/` 資料夾)
+
+- `earthly-branches.js` - 地支數字對照 (12 entries)
 - `gua-colors.js` - 八卦顏色對照 (8 color mappings)
 - `hexagram-matrix.js` - 六十四卦矩陣 (64 hexagram combinations)
-- `i-ching-data.js` - 易經爻辭資料 (hexagram data with lines)
-- `yao-ci-explanations.js` - 爻辭白話解釋 (384 line explanations)
+- `iching-hexagrams.js` - 主要易經卦辭與爻辭資料 (64 hexagrams × 6 lines)
+- `iching-data.js` - 詳細卦象解釋 (judgment & explanation)
+- `iching-palaces.js` - 易經八宮歸屬 (64 palace mappings)
+- `yao-explanations.js` - 爻辭白話解釋 (384 line explanations)
+- `bagua-map.js` - 先天八卦對照表 (8 primary trigrams)
+- `iching-lines.js` - 爻線詳細資料
+- `fuxi-bagua.png` - 伏羲先天八卦圖
+
+> 📝 **資料庫重新整理** (2025-01-17)：統一命名規則、移除重複檔案、優化組織結構
 
 ## �️ 技術架構
 
@@ -150,7 +159,7 @@ const corsProxies = [
 系統基於以下要素提供建議：
 
 - **天機星特質**: 智慧、分析、學習能力
-- **巨門星特質**: 溝通、口才、表達能力  
+- **巨門星特質**: 溝通、口才、表達能力
 - **時間起卦**: 傳統梅花易數起卦法
 - **星象整合**: 即時西洋星座能量
 - **多維度分析**: 爻辭、卦象、星座三重解析
@@ -158,7 +167,7 @@ const corsProxies = [
 ### 3. 生活助手功能
 
 - **美食推薦**: 智能隨機餐點推薦系統
-- **Google地圖整合**: 一鍵搜尋附近餐廳
+- **Google 地圖整合**: 一鍵搜尋附近餐廳
 - **時段分類**: 早餐、午餐、晚餐、宵夜專屬選項
 - **主題色同步**: 頁面間視覺一致性
 
@@ -173,9 +182,9 @@ const corsProxies = [
 
 ### 前端技術棧
 
-- **HTML5** - 語義化標籤和PWA支援
-- **CSS3** - Flexbox、Grid、響應式設計、CSS變量
-- **Vanilla JavaScript** - 模組化ES6+程式碼
+- **HTML5** - 語義化標籤和 PWA 支援
+- **CSS3** - Flexbox、Grid、響應式設計、CSS 變量
+- **Vanilla JavaScript** - 模組化 ES6+程式碼
 - **lunar-javascript** - 農曆轉換庫
 
 ### 資料庫模組化架構
@@ -197,12 +206,12 @@ database/
 - **移動優先策略** - 從小螢幕開始設計向上擴展
 - **靈活斷點系統**：
   - 480px: 極小螢幕（舊款手機）
-  - 768px: 平板直向模式分界點  
+  - 768px: 平板直向模式分界點
   - 1024px: 平板橫向和小桌面
 - **觸控優化**：
-  - 最小44px觸控目標（符合Apple HIG標準）
+  - 最小 44px 觸控目標（符合 Apple HIG 標準）
   - 防誤觸間距設計
-  - iOS Safari兼容性
+  - iOS Safari 兼容性
   - 平滑捲動支援
 - **性能優化**：
   - 硬體加速動畫
@@ -211,10 +220,10 @@ database/
 
 ### API 系統架構
 
-- **多層代理備援**：4個CORS代理服務
-- **自動故障轉移**：智能API切換機制  
+- **多層代理備援**：4 個 CORS 代理服務
+- **自動故障轉移**：智能 API 切換機制
 - **錯誤處理**：完善的降級策略
-- **AI預測模式**：API失效時的智能預測
+- **AI 預測模式**：API 失效時的智能預測
 
 ### 3. 幸運色應用
 
@@ -262,12 +271,12 @@ database/
 
 ### 響應式佈局
 
-- **移動設備**: 優化觸摸體驗，44px最小觸控目標
+- **移動設備**: 優化觸摸體驗，44px 最小觸控目標
 - **桌面設備**: 充分利用螢幕空間，側邊欄導航
 - **平板設備**: 平衡的閱讀體驗，自適應佈局
-- **跨瀏覽器**: Chrome、Firefox、Safari、Edge全支援
-- **觸控優化**: iOS平滑滾動，防誤觸設計
-- **iframe同步**: 子頁面主題色自動同步
+- **跨瀏覽器**: Chrome、Firefox、Safari、Edge 全支援
+- **觸控優化**: iOS 平滑滾動，防誤觸設計
+- **iframe 同步**: 子頁面主題色自動同步
 
 ## 🚧 未來規劃
 
