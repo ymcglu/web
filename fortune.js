@@ -282,7 +282,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <li>下卦：年(${calculation.yearBranchNum}) + 月(${calculation.month}) + 日(${calculation.day}) + 時(${calculation.timeBranch}=${calculation.timeBranchNum}) = ${calculation.lowerSum} ÷ 8 = 餘${divination.lowerGuaNum} → <strong>${lowerGua}卦</strong></li>
                     <li>動爻：${calculation.lowerSum} ÷ 6 = 餘${changingLineNum} → <strong>第${changingLineNum}爻</strong></li>
                 </ul>
-                <p><strong>本卦結果：</strong>上${upperGua}下${lowerGua} = <strong>第${hexagramNumber}卦 ${hexagram.name}卦</strong></p>
+                <p><strong>本卦結果：</strong>上${upperGua}下${lowerGua} = <strong>第${hexagramNumber}卦 ${hexagram.name}卦 ${hexagramUnicode[hexagram.name] || ''}</strong></p>
                 <p style="font-size: 0.9em; color: #888; margin-bottom: 0;">※ 按照傳統梅花易數時間起卦法，以打開網頁的時間為準</p>
             </div>`;
         } else {
