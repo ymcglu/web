@@ -1,19 +1,18 @@
-# 智慧運勢系統 - Daily Insights
+# 智慧運勢系統
 
-一個結合**易經占卜**、**紫微斗數**和**西洋星座**的現代化智慧運勢分析系統，為您提供深度個人化的每日指導。現已全面支援響應式設計，完美適配手機、平板和桌面設備。
+一個結合**易經占卜**、**紫微斗數**和**西洋星座**的現代化智慧運勢分析系統，為您提供深度個人化的每日指導。
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Version](https://img.shields.io/badge/version-2.1.0-green.svg)
+![Version](https://img.shields.io/badge/version-2.0.0-green.svg)
 ![Language](https://img.shields.io/badge/language-JavaScript-yellow.svg)
 ![Status](https://img.shields.io/badge/status-stable-brightgreen.svg)
-![Responsive](https://img.shields.io/badge/responsive-✓-brightgreen.svg)
 
 ## ✨ 主要特色
 
 ### 🔮 三元合一分析系統
 
 - **易經智慧** - 完整的 64 卦 384 爻辭解釋系統，傳統時間起卦法
-- **紫微斗數** - 個人化命盤分析（天機、巨門星特質）
+- **紫微斗數** - 個人化命盤分析
 - **西洋星座** - 即時星象能量整合，多重 API 備援
 - **AI 整合** - 智能化的個人化建議生成
 
@@ -25,24 +24,12 @@
 4. **平和安全** (無咎、無悔) - 穩定維護方法
 5. **觀察洞察** - 深度洞察和耐心指導
 
-### 📱 全平台響應式體驗
-
-- **完整自適應設計** - 桌面、平板、手機完美適配
-- **斷點優化**：
-  - 桌面版 (1024px+)：完整雙欄佈局
-  - 平板版 (768px-1024px)：優化間距和字體
-  - 手機版 (≤768px)：單欄佈局，導航置底
-  - 小螢幕 (≤480px)：極致精簡化設計
-- **觸控優化** - 符合 iOS 44px 最小觸控目標標準
-- **手勢友好** - 平滑捲動和觸控回饋
-- **PWA 就緒** - 支援離線瀏覽與應用安裝
-
-### 🎨 動態視覺體驗
+### 🎨 用戶體驗
 
 - **每日幸運色** - 基於卦象的色彩能量
 - **動態主題** - 隨運勢變化的視覺體驗
-- **色彩同步** - 主頁面與子頁面主題色自動同步
-- **深色主題** - 護眼深色界面設計
+- **時間起卦** - 農曆時間精確起卦系統
+- **多重備援** - 4 層 CORS 代理確保 API 可用性
 
 ## 快速開始
 
@@ -128,31 +115,20 @@ const corsProxies = [
 
 #### 3. 模組化資料庫結構
 
-**核心資料檔案** (位於 `/database/` 資料夾)
-
-- `earthly-branches.js` - 地支數字對照 (12 entries)
+- `earthly-branch-numbers.js` - 地支數字對照 (12 entries)
 - `gua-colors.js` - 八卦顏色對照 (8 color mappings)
 - `hexagram-matrix.js` - 六十四卦矩陣 (64 hexagram combinations)
-- `iching-hexagrams.js` - 主要易經卦辭與爻辭資料 (64 hexagrams × 6 lines)
-- `iching-data.js` - 詳細卦象解釋 (judgment & explanation)
-- `iching-palaces.js` - 易經八宮歸屬 (64 palace mappings)
-- `yao-explanations.js` - 爻辭白話解釋 (384 line explanations)
-- `bagua-map.js` - 先天八卦對照表 (8 primary trigrams)
-- `iching-lines.js` - 爻線詳細資料
-- `fuxi-bagua.png` - 伏羲先天八卦圖
-
-> 📝 **資料庫重新整理** (2025-01-17)：統一命名規則、移除重複檔案、優化組織結構
-
-## �️ 技術架構
+- `i-ching-data.js` - 易經爻辭資料 (hexagram data with lines)
+- `yao-ci-explanations.js` - 爻辭白話解釋 (384 line explanations)
 
 ## 🎯 使用說明
 
 ### 1. 每日運勢查詢
 
 - 打開網站自動生成今日運勢
-- 基於農曆精確時間起卦（梅花易數）
+- 基於農曆精確時間起卦
 - 結合您的命盤特質與今日星象
-- 提供具體的行動建議和時機指導
+- 提供具體的行動建議
 
 ### 2. 智能分析特色
 
@@ -162,68 +138,6 @@ const corsProxies = [
 - **巨門星特質**: 溝通、口才、表達能力
 - **時間起卦**: 傳統梅花易數起卦法
 - **星象整合**: 即時西洋星座能量
-- **多維度分析**: 爻辭、卦象、星座三重解析
-
-### 3. 生活助手功能
-
-- **美食推薦**: 智能隨機餐點推薦系統
-- **Google 地圖整合**: 一鍵搜尋附近餐廳
-- **時段分類**: 早餐、午餐、晚餐、宵夜專屬選項
-- **主題色同步**: 頁面間視覺一致性
-
-### 4. 響應式使用體驗
-
-- **桌面版**: 雙欄佈局，完整功能展示
-- **平板版**: 優化觸控體驗，適中的資訊密度
-- **手機版**: 單欄佈局，導航置底，單手操作友好
-- **離線模式**: 基礎功能離線可用
-
-## 🏗️ 技術架構
-
-### 前端技術棧
-
-- **HTML5** - 語義化標籤和 PWA 支援
-- **CSS3** - Flexbox、Grid、響應式設計、CSS 變量
-- **Vanilla JavaScript** - 模組化 ES6+程式碼
-- **lunar-javascript** - 農曆轉換庫
-
-### 資料庫模組化架構
-
-```
-database/
-├── earthly-branch-numbers.js  # 地支數字對照系統
-├── gua-colors.js             # 八卦色彩能量對照
-├── hexagram-matrix.js        # 六十四卦矩陣查詢
-├── i-ching-data.js          # 完整易經卦辭資料（64卦384爻）
-├── i-ching-lines.js         # 易經爻線資料
-├── i-ching-palace.js        # 易經宮位對照
-├── primal-bagua-map.js      # 先天八卦對照系統
-└── yao-ci-explanations.js   # 爻辭白話解釋
-```
-
-### 響應式設計架構
-
-- **移動優先策略** - 從小螢幕開始設計向上擴展
-- **靈活斷點系統**：
-  - 480px: 極小螢幕（舊款手機）
-  - 768px: 平板直向模式分界點
-  - 1024px: 平板橫向和小桌面
-- **觸控優化**：
-  - 最小 44px 觸控目標（符合 Apple HIG 標準）
-  - 防誤觸間距設計
-  - iOS Safari 兼容性
-  - 平滑捲動支援
-- **性能優化**：
-  - 硬體加速動畫
-  - 防止水平捲動
-  - 字體渲染優化
-
-### API 系統架構
-
-- **多層代理備援**：4 個 CORS 代理服務
-- **自動故障轉移**：智能 API 切換機制
-- **錯誤處理**：完善的降級策略
-- **AI 預測模式**：API 失效時的智能預測
 
 ### 3. 幸運色應用
 
@@ -271,12 +185,9 @@ database/
 
 ### 響應式佈局
 
-- **移動設備**: 優化觸摸體驗，44px 最小觸控目標
-- **桌面設備**: 充分利用螢幕空間，側邊欄導航
-- **平板設備**: 平衡的閱讀體驗，自適應佈局
-- **跨瀏覽器**: Chrome、Firefox、Safari、Edge 全支援
-- **觸控優化**: iOS 平滑滾動，防誤觸設計
-- **iframe 同步**: 子頁面主題色自動同步
+- **移動設備**: 優化觸摸體驗
+- **桌面設備**: 充分利用螢幕空間
+- **平板設備**: 平衡的閱讀體驗
 
 ## 🚧 未來規劃
 

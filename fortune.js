@@ -282,11 +282,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <li>下卦：年(${calculation.yearBranchNum}) + 月(${calculation.month}) + 日(${calculation.day}) + 時(${calculation.timeBranch}=${calculation.timeBranchNum}) = ${calculation.lowerSum} ÷ 8 = 餘${divination.lowerGuaNum} → <strong>${lowerGua}卦</strong></li>
                     <li>動爻：${calculation.lowerSum} ÷ 6 = 餘${changingLineNum} → <strong>第${changingLineNum}爻</strong></li>
                 </ul>
-                                <div style="text-align: center; padding: 20px 0 15px 0; border-top: 1px solid #444; border-bottom: 1px solid #444; margin-top: 15px; background: rgba(0,0,0,0.1); border-radius: 5px;">
-                    <div style="font-size: 5em; line-height: 1; color: ${luckyColorHex}; margin-bottom: 15px;">${hexagramUnicode[hexagram.name] || ''}</div>
-                    <div style="font-size: 1.6em; font-weight: bold;">${hexagram.name}卦</div>
-                    <div style="font-size: 1em; color: #bbb; margin-top: 5px;">第${hexagramNumber}卦 | 上${upperGua} 下${lowerGua}</div>
-                </div>
+                <p><strong>本卦結果：</strong>上${upperGua}下${lowerGua} = <strong>第${hexagramNumber}卦 ${hexagram.name}卦</strong></p>
                 <p style="font-size: 0.9em; color: #888; margin-bottom: 0;">※ 按照傳統梅花易數時間起卦法，以打開網頁的時間為準</p>
             </div>`;
         } else {

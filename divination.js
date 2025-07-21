@@ -41,13 +41,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const hexagramKey = `${upperGuaName}${lowerGuaName}`;
         const result = hexagramData[hexagramKey]; // hexagramData is global from hexagram-data.js
-        const hexagramSymbol = hexagramUnicode[result.name];
 
         if (result) {
             targetElement.innerHTML = `
-                <h3>${result.name} <span class="hexagram-symbol">${hexagramSymbol}</span></h3>
+                <h3>${result.name}</h3>
                 <p><strong>本卦：</strong>${upperGuaName}上 ${lowerGuaName}下</p>
-                <p><strong>卦辭：</strong>${result.judgment}</p>
+                <p><strong>卦辭：：</strong>${result.judgment}</p>
                 <p><strong>解說：</strong>${result.explanation}</p>
                 <p><strong>動爻：</strong>第 ${movingYaoNum} 爻 (由下往上數)</p>
             `;
