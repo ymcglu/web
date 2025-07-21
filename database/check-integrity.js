@@ -1,7 +1,36 @@
+const fs = require('fs');
+const path = require('path');
+
 // 資料庫檔案完整性檢查腳本
 // 用於驗證所有資料檔案是否正確載入
 
 console.log("🔍 開始檢查資料庫檔案完整性...");
+
+const databasePath = __dirname;
+
+// 載入所有資料庫檔案
+const filesToLoad = [
+    'earthly-branches.js',
+    'gua-colors.js',
+    'iching-palaces.js',
+    'iching-hexagrams.js',
+    'yao-explanations.js',
+    'bagua-map.js',
+    'hexagram-matrix.js',
+    'iching-data.js',
+    'iching-lines.js'
+];
+
+filesToLoad.forEach(file => {
+    try {
+        const filePath = path.join(databasePath, file);
+        const fileContent = fs.readFileSync(filePath, 'utf8');
+        eval(fileContent);
+    } catch (error) {
+        console.error(`❌ 載入檔案 ${file} 失敗: ${error.message}`);
+    }
+});
+
 
 // 檢查所有必要的變數是否已定義
 const requiredVariables = [
