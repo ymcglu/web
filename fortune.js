@@ -14,6 +14,68 @@ document.addEventListener('DOMContentLoaded', function() {
     // 核心功能函數
     // =========================================================================
 
+    // 八卦爻線對應表 (從下到上)
+    const baguaLines = {
+        '乾': ['—', '—', '—'],  // 三陽爻
+        '兌': ['—', '—', '- -'], // 上陰下二陽
+        '離': ['—', '- -', '—'], // 中陰上下陽
+        '震': ['- -', '—', '—'], // 下陰上二陽
+        '巽': ['—', '- -', '- -'], // 上陽下二陰
+        '坎': ['- -', '—', '- -'], // 中陽上下陰
+        '艮': ['- -', '- -', '—'], // 上陽下二陰
+        '坤': ['- -', '- -', '- -']  // 三陰爻
+    };
+
+    // 生成六爻卦象圖示
+    function generateHexagramVisual(hexagramName, changingLine) {
+        let upperGuaName, lowerGuaName;
+        
+        // 如果是八卦本身（重卦）
+        if (hexagramName === '乾' || hexagramName === '坤' || hexagramName === '坎' || hexagramName === '離' || 
+            hexagramName === '震' || hexagramName === '巽' || hexagramName === '艮' || hexagramName === '兌') {
+            upperGuaName = lowerGuaName = hexagramName;
+        } else {
+            // 從hexagramMatrix反推上下卦
+            const hexagramKey = Object.keys(hexagramMatrix).find(key => {
+                const hexNum = hexagramMatrix[key];
+                return iChingData[hexNum] && iChingData[hexNum].name === hexagramName;
+            });
+            
+            if (hexagramKey && hexagramKey.length === 2) {
+                upperGuaName = hexagramKey.charAt(0);
+                lowerGuaName = hexagramKey.charAt(1);
+            } else {
+                // 備用方案：使用預設
+                upperGuaName = lowerGuaName = '乾';
+            }
+        }
+        
+        const upperLines = baguaLines[upperGuaName] || ['—', '—', '—'];
+        const lowerLines = baguaLines[lowerGuaName] || ['—', '—', '—'];
+        
+        // 組合六爻 (從下到上：下卦三爻 + 上卦三爻)
+        const allLines = [...lowerLines, ...upperLines];
+        
+        // 標記變爻 (changingLine 是0-5的索引)
+        let visualLines = allLines.map((line, index) => {
+            const isChanging = index === changingLine;
+            const lineNumber = index + 1;
+            const prefix = isChanging ? '●' : '○';
+            const spacing = line === '—' ? '———' : '— —'; // 讓陽爻和陰爻更清晰
+            return `${prefix} ${spacing}  第${lineNumber}爻`;
+        });
+        
+        // 反轉順序，因為易經是從上到下讀的
+        visualLines.reverse();
+        
+        return {
+            lines: visualLines,
+            upperGua: upperGuaName,
+            lowerGua: lowerGuaName,
+            ascii: visualLines.map(line => line.split('  ')[0]).join('\n')
+        };
+    }
+
     function getContrastingTextColor(hexColor) {
         if (hexColor.startsWith('#')) {
             hexColor = hexColor.slice(1);
@@ -314,8 +376,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
             <h4><strong>策略：易經的智慧箴言</strong></h4>
             <p>針對今日的能量主題，易經為您指引的策略核心，來自 <strong>${hexagram.name}卦</strong> 的第 <strong>${changingLine + 1}</strong> 爻，其爻辭為：</p>
-            <p class="yao-ci">「${yaoCi}」</p>
-            <p style="font-style: italic; color: #c0c0c0;"><strong>爻辭淺釋：</strong>${yaoCiExplanation}</p>
+            
+            <div class="yao-ci-container">
+                <div class="yao-ci-image">
+                    <div class="hexagram-ascii">${generateHexagramVisual(hexagram.name, changingLine).lines.join('\n')}</div>
+                </div>
+                <div class="yao-ci-content">
+                    <p class="yao-ci">「${yaoCi}」</p>
+                    <p style="font-style: italic; color: #c0c0c0; margin: 0;"><strong>爻辭淺釋：</strong>${yaoCiExplanation}</p>
+                </div>
+            </div>
 
             <h4><strong>綜合建議：今日的行動方案</strong></h4>
             <div style="line-height: 1.6; white-space: pre-line;">${interpret(astroTheme, zwdsProfile, hexagram.name, yaoCi)}</div>
