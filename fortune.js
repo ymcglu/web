@@ -67,8 +67,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const isChanging = index === changingLine;
             const lineNumber = index + 1;
             const prefix = isChanging ? '●' : '○';
-            const spacing = line === '—' ? '———' : '— —'; // 讓陽爻和陰爻更清晰
-            return `${prefix} ${spacing}  ${numberToChinese(lineNumber)}爻`;
+            const spacing = line === '—' ? '━━━' : '━ ━'; // 使用更粗的線條
+            return `${prefix} ${spacing}`;
         });
         
         // 反轉順序，因為易經是從上到下讀的
@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
             lines: visualLines,
             upperGua: upperGuaName,
             lowerGua: lowerGuaName,
-            ascii: visualLines.map(line => line.split('  ')[0]).join('\n')
+            ascii: visualLines.join('\n')
         };
     }
 
@@ -355,13 +355,8 @@ document.addEventListener('DOMContentLoaded', function() {
             <div style="background: rgba(255,255,255,0.05); border-left: 4px solid ${luckyColorHex}; padding: 15px; margin: 15px 0; border-radius: 5px;">
                 <h4 style="margin-top: 0; color: ${luckyColorHex};">🎯 今日時間起卦詳情</h4>
                 <p><strong>起卦時間：</strong>農曆${lunarDate.lunarYear}年${lunarDate.lunarMonth}月${lunarDate.lunarDay}日 ${calculation.timeBranch}時</p>
-                <p><strong>起卦算式：</strong></p>
-                <ul style="margin: 5px 0; padding-left: 20px;">
-                    <li>上卦：年(${calculation.yearBranch}=${calculation.yearBranchNum}) + 月(${calculation.month}) + 日(${calculation.day}) = ${calculation.upperSum} ÷ 8 = 餘${divination.upperGuaNum} → <strong>${upperGua}卦</strong></li>
-                    <li>下卦：年(${calculation.yearBranchNum}) + 月(${calculation.month}) + 日(${calculation.day}) + 時(${calculation.timeBranch}=${calculation.timeBranchNum}) = ${calculation.lowerSum} ÷ 8 = 餘${divination.lowerGuaNum} → <strong>${lowerGua}卦</strong></li>
-                    <li>動爻：${calculation.lowerSum} ÷ 6 = 餘${changingLineNum} → <strong>第${changingLineNum}爻</strong></li>
-                </ul>
-                <p><strong>本卦結果：</strong>上${upperGua}下${lowerGua} = <strong>第${hexagramNumber}卦 ${hexagram.name}卦</strong></p>
+                <p><strong>卦象組成：</strong>上${upperGua}卦 + 下${lowerGua}卦 = <strong>第${hexagramNumber}卦 ${hexagram.name}卦</strong></p>
+                <p><strong>變爻位置：</strong>第${changingLineNum}爻</p>
                 <p style="font-size: 0.9em; color: #888; margin-bottom: 0;">※ 按照傳統梅花易數時間起卦法，以打開網頁的時間為準</p>
             </div>`;
         } else {

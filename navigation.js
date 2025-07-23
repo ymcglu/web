@@ -35,11 +35,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // 移除所有啟用狀態
         navLinks.forEach(navLink => navLink.classList.remove('active'));
-        contentSections.forEach(section => section.classList.remove('active'));
+        
+        // 先將所有內容區塊標記為非活動
+        contentSections.forEach(section => {
+            section.classList.remove('active');
+            section.style.display = 'none';
+        });
 
         // 添加新的啟用狀態
         clickedLink.classList.add('active');
-        targetSection.classList.add('active');
+        
+        // 顯示目標區塊
+        targetSection.style.display = 'block';
+        setTimeout(() => {
+            targetSection.classList.add('active');
+        }, 10);
 
         // 更新無障礙屬性
         updateAriaAttributes(clickedLink, targetSection);
@@ -129,9 +139,19 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 250);
     });
 
-    // 初始化無障礙屬性
+    // 初始化無障礙屬性和顯示狀態
     const activeLink = document.querySelector('.nav-link.active');
     const activeSection = document.querySelector('.content-section.active');
+    
+    // 確保只有活動區塊是可見的
+    contentSections.forEach(section => {
+        if (section !== activeSection) {
+            section.style.display = 'none';
+        } else {
+            section.style.display = 'block';
+        }
+    });
+    
     if (activeLink && activeSection) {
         updateAriaAttributes(activeLink, activeSection);
     }
