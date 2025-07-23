@@ -56,13 +56,19 @@ document.addEventListener('DOMContentLoaded', function() {
         // 組合六爻 (從下到上：下卦三爻 + 上卦三爻)
         const allLines = [...lowerLines, ...upperLines];
         
+        // 數字轉中文
+        const numberToChinese = (num) => {
+            const chineseNumbers = ['', '一', '二', '三', '四', '五', '六'];
+            return chineseNumbers[num] || num.toString();
+        };
+        
         // 標記變爻 (changingLine 是0-5的索引)
         let visualLines = allLines.map((line, index) => {
             const isChanging = index === changingLine;
             const lineNumber = index + 1;
             const prefix = isChanging ? '●' : '○';
             const spacing = line === '—' ? '———' : '— —'; // 讓陽爻和陰爻更清晰
-            return `${prefix} ${spacing}  第${lineNumber}爻`;
+            return `${prefix} ${spacing}  ${numberToChinese(lineNumber)}爻`;
         });
         
         // 反轉順序，因為易經是從上到下讀的

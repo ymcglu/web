@@ -1,47 +1,107 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=5.0"
+    />
+    <meta
+      name="description"
+      content="智慧運勢系統 - 結合易經、紫微斗數與西洋星座的每日運勢指導"
+    />
+    <meta name="keywords" content="易經,運勢,占卜,紫微斗數,星座,每日運勢" />
+    <meta name="author" content="ymcglu" />
+    <meta name="theme-color" content="#66bb6a" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-mobile-web-app-title" content="Daily Insights" />
     <title>Daily Insights - Fortune & Life Guide</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" />
     <script src="https://cdn.jsdelivr.net/npm/lunar-javascript@1.3.2/lunar.min.js"></script>
-</head>
-<body>
+  </head>
+  <body>
+    <a href="#main-content" class="skip-link">跳到主要內容</a>
     <header>
-                <h1>Daily Insights</h1>
+      <h1>Daily Insights</h1>
     </header>
 
     <div class="main-container">
-        <aside class="sidebar">
-            <nav>
-                <ul>
-                    <li><a href="#" class="nav-link active" data-target="daily-fortune-content">Daily Fortune</a></li>
-                    <li><a href="#" class="nav-link" data-target="what-to-eat-content">What to Eat</a></li>
-                </ul>
-            </nav>
-        </aside>
+      <aside class="sidebar" role="navigation" aria-label="主要導航">
+        <nav>
+          <ul role="tablist">
+            <li role="presentation">
+              <a
+                href="#daily-fortune-content"
+                class="nav-link active"
+                data-target="daily-fortune-content"
+                role="tab"
+                aria-selected="true"
+                aria-controls="daily-fortune-content"
+                id="tab-daily-fortune"
+              >
+                每日運勢
+              </a>
+            </li>
+            <li role="presentation">
+              <a
+                href="#what-to-eat-content"
+                class="nav-link"
+                data-target="what-to-eat-content"
+                role="tab"
+                aria-selected="false"
+                aria-controls="what-to-eat-content"
+                id="tab-what-to-eat"
+              >
+                美食推薦
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </aside>
 
-        <main class="content-area">
-            <div id="daily-fortune-content" class="content-section active">
-                <section id="daily-fortune">
-                    <h2>Daily Fortune & Guidance</h2>
-                    <div id="fortune-content"></div>
-                </section>
-            </div>
+      <main class="content-area" role="main" id="main-content">
+        <div
+          id="daily-fortune-content"
+          class="content-section active"
+          role="tabpanel"
+          aria-labelledby="tab-daily-fortune"
+          tabindex="0"
+        >
+          <section id="daily-fortune" aria-label="每日運勢內容">
+            <h2>每日運勢與指導</h2>
+            <div id="fortune-content" aria-live="polite"></div>
+          </section>
+        </div>
 
-            <div id="what-to-eat-content" class="content-section">
-                <iframe src="eat/what_to_eat.html" class="content-iframe"></iframe>
-            </div>
-        </main>
+        <div
+          id="what-to-eat-content"
+          class="content-section"
+          role="tabpanel"
+          aria-labelledby="tab-what-to-eat"
+          tabindex="0"
+          aria-hidden="true"
+        >
+          <iframe
+            src="eat/what_to_eat.html"
+            class="content-iframe"
+            title="美食推薦工具"
+            loading="lazy"
+          ></iframe>
+        </div>
+      </main>
     </div>
 
     <footer>
-        <p>&copy; 2025 ymcglu</p>
+      <p>&copy; 2025 ymcglu</p>
     </footer>
 
     <script src="database/database.js"></script>
     <script src="fortune.js"></script>
     <script src="navigation.js"></script>
-</body>
+  </body>
 </html>
