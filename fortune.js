@@ -658,10 +658,13 @@ document.addEventListener("DOMContentLoaded", function () {
             
             <div class="yao-ci-container">
                 <div class="yao-ci-image">
-                    <div class="hexagram-ascii">${generateHexagramVisual(
-                      hexagram.name,
-                      changingLine
-                    ).lines.join("\n")}</div>
+                    <div class="hexagram-ascii">
+                        ${generateHexagramVisual(
+                          hexagram.name,
+                          changingLine
+                        ).lines.join("\n")}
+                        <div class="yao-numbers">六\n五\n四\n三\n二\n一</div>
+                    </div>
                 </div>
                 <div class="yao-ci-content">
                     <p class="yao-ci">「${yaoCi}」</p>
