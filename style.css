@@ -3,11 +3,19 @@
     --theme-color-rgb: 102, 187, 106; /* RGB 變數支援 */
     --theme-secondary: #90ee90;
     --theme-accent: #98fb98;
+    
+    /* 玻璃質感系統 */
     --glass-bg: rgba(30, 30, 30, 0.7);
+    --glass-bg-fallback: rgba(30, 30, 30, 0.85); /* 不支援 backdrop-filter 的降級背景 */
     --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-border-bright: rgba(255, 255, 255, 0.15);
     --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    --glass-shadow-strong: 0 12px 40px rgba(0, 0, 0, 0.4);
     --glass-blur: blur(16px);
+    --glass-blur-light: blur(8px);
     --glass-accent: rgba(var(--theme-color-rgb), 0.15);
+    --glass-highlight: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(255, 255, 255, 0.05) 100%);
+    
     --accent-gradient: linear-gradient(135deg, var(--theme-color), rgba(var(--theme-color-rgb), 0.8));
     --animation-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
     --animation-smooth: cubic-bezier(0.4, 0, 0.2, 1);
@@ -22,6 +30,79 @@
 /* 基本設定: 深色主題 */
 * {
     box-sizing: border-box;
+}
+
+/* backdrop-filter 支援檢測和降級處理 */
+@supports not (backdrop-filter: blur(1px)) and not (-webkit-backdrop-filter: blur(1px)) {
+    .no-backdrop-filter header,
+    .no-backdrop-filter .sidebar,
+    .no-backdrop-filter #daily-fortune,
+    .no-backdrop-filter .content-section section,
+    .no-backdrop-filter footer,
+    .no-backdrop-filter .yao-ci-container,
+    .no-backdrop-filter .hexagram-ascii {
+        background: var(--glass-bg-fallback) !important;
+        box-shadow: var(--glass-shadow-strong) !important;
+        border: 1px solid var(--glass-border-bright) !important;
+    }
+    
+    .no-backdrop-filter .sidebar .nav-link {
+        background: rgba(37, 37, 37, 0.9) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    .no-backdrop-filter .sidebar .nav-link.active {
+        background: var(--accent-gradient) !important;
+        box-shadow: 0 6px 20px rgba(102, 187, 106, 0.5) !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    }
+    
+    .no-backdrop-filter .yao-ci-container {
+        background: rgba(37, 37, 37, 0.9) !important;
+        border: 1px solid rgba(255, 123, 114, 0.5) !important;
+    }
+    
+    .no-backdrop-filter .hexagram-ascii {
+        background: rgba(0, 0, 0, 0.95) !important;
+        border: 2px solid rgba(255, 215, 0, 0.8) !important;
+        box-shadow: 0 8px 24px rgba(255, 215, 0, 0.5) !important;
+    }
+}
+
+/* 高對比度模式優化 */
+@media (prefers-contrast: high) {
+    :root {
+        --glass-bg: rgba(0, 0, 0, 0.9);
+        --glass-border: rgba(255, 255, 255, 0.3);
+        --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+    }
+    
+    .sidebar .nav-link {
+        border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .sidebar .nav-link.active {
+        border: 2px solid rgba(255, 255, 255, 0.5);
+    }
+}
+
+/* 減少動畫偏好設定 */
+@media (prefers-reduced-motion: reduce) {
+    .sidebar .nav-link,
+    header,
+    #daily-fortune,
+    .content-section section,
+    footer {
+        transition: none;
+    }
+    
+    .sidebar .nav-link::before,
+    header::before,
+    #daily-fortune::before,
+    .content-section section::before,
+    footer::before {
+        transition: none;
+    }
 }
 
 /* 主題切換過渡動畫 */
@@ -130,7 +211,7 @@ body, html {
     }
 }
 
-/* 頁首 - 玻璃質感 */
+/* 頁首 - 增強玻璃質感 */
 header {
     background: var(--glass-bg);
     backdrop-filter: var(--glass-blur);
@@ -150,9 +231,22 @@ header::before {
     top: 0;
     left: 0;
     right: 0;
+    bottom: 0;
+    background: var(--glass-highlight);
+    pointer-events: none;
+    z-index: 1;
+}
+
+header::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
     height: 1px;
     background: linear-gradient(90deg, transparent, var(--theme-color), transparent);
     opacity: 0.6;
+    z-index: 2;
 }
 
 header h1 {
@@ -161,7 +255,7 @@ header h1 {
     color: var(--theme-color); /* 使用CSS變數 */
 }
 
-/* 每日運勢 - 玻璃質感 */
+/* 每日運勢 - 增強玻璃質感 */
 #daily-fortune {
     margin-top: 1.5rem;
     padding: 20px;
@@ -182,12 +276,26 @@ header h1 {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, 
-        rgba(255, 255, 255, 0.02) 0%, 
-        rgba(255, 255, 255, 0.08) 50%, 
-        rgba(255, 255, 255, 0.02) 100%);
+    background: var(--glass-highlight);
     pointer-events: none;
     border-radius: 16px;
+    z-index: 1;
+}
+
+#daily-fortune::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(var(--theme-color-rgb), 0.8) 30%, 
+        rgba(var(--theme-color-rgb), 0.8) 70%, 
+        transparent 100%);
+    border-radius: 16px 16px 0 0;
+    z-index: 2;
 }
 
 /* 桌面版每日運勢優化 */
@@ -246,7 +354,7 @@ header h1 {
     font-size: 1.1rem;
 }
 
-/* 爻辭容器 - 玻璃質感 */
+/* 爻辭容器 - 增強玻璃質感 */
 .yao-ci-container {
     display: flex;
     align-items: flex-start;
@@ -258,7 +366,7 @@ header h1 {
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 123, 114, 0.3);
     border-radius: 12px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    box-shadow: 0 6px 24px rgba(0,0,0,0.4);
     position: relative;
     overflow: hidden;
 }
@@ -271,11 +379,27 @@ header h1 {
     right: 0;
     bottom: 0;
     background: linear-gradient(135deg, 
-        rgba(255, 123, 114, 0.05) 0%, 
-        transparent 50%, 
-        rgba(255, 123, 114, 0.05) 100%);
+        rgba(255, 123, 114, 0.08) 0%, 
+        rgba(255, 123, 114, 0.02) 50%, 
+        rgba(255, 123, 114, 0.08) 100%);
     pointer-events: none;
     border-radius: 12px;
+    z-index: 1;
+}
+
+.yao-ci-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255, 123, 114, 0.6) 50%, 
+        transparent 100%);
+    border-radius: 12px 12px 0 0;
+    z-index: 2;
 }
 
 /* 爻辭圖像區域 */
@@ -288,7 +412,7 @@ header h1 {
     padding: 4px;
 }
 
-/* ASCII卦象樣式 - 玻璃質感 */
+/* ASCII卦象樣式 - 增強玻璃質感 */
 .hexagram-ascii {
     font-family: 'Courier New', 'Monaco', 'Menlo', 'Consolas', monospace;
     font-size: 16px;
@@ -296,23 +420,25 @@ header h1 {
     line-height: 1.4;
     margin: 0;
     padding: 12px 16px;
-    background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border-radius: 10px;
-    border: 2px solid rgba(255, 215, 0, 0.6);
+    border: 2px solid rgba(255, 215, 0, 0.7);
     text-align: left;
     white-space: pre-line;
     font-weight: 500;
     letter-spacing: 0px;
     word-spacing: 0;
-    box-shadow: 0 4px 16px rgba(255, 215, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4), 
+                inset 0 1px 0 rgba(255, 255, 255, 0.15),
+                inset 0 -1px 0 rgba(255, 215, 0, 0.1);
     min-width: 160px;
     width: 160px;
     height: auto;
     display: block;
     position: relative;
-    text-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
+    text-shadow: 0 0 12px rgba(255, 215, 0, 0.6);
 }
 
 .hexagram-ascii::before {
@@ -323,11 +449,12 @@ header h1 {
     right: 0;
     bottom: 0;
     background: linear-gradient(135deg, 
-        rgba(255, 215, 0, 0.05) 0%, 
-        transparent 50%, 
-        rgba(255, 215, 0, 0.05) 100%);
+        rgba(255, 215, 0, 0.08) 0%, 
+        rgba(255, 215, 0, 0.02) 50%, 
+        rgba(255, 215, 0, 0.08) 100%);
     pointer-events: none;
     border-radius: 8px;
+    z-index: 1;
 }
 
 /* 卦象中的爻字樣式 */
@@ -478,7 +605,7 @@ header h1 {
     flex: 1;
 }
 
-/* 側邊導覽列 - 玻璃質感 */
+/* 側邊導覽列 - 增強玻璃質感 */
 .sidebar {
     width: 220px;
     background: var(--glass-bg);
@@ -497,11 +624,24 @@ header h1 {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(180deg, 
-        rgba(255, 255, 255, 0.02) 0%, 
-        rgba(255, 255, 255, 0.01) 50%, 
-        rgba(255, 255, 255, 0.02) 100%);
+    background: var(--glass-highlight);
     pointer-events: none;
+    z-index: 1;
+}
+
+.sidebar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 1px;
+    height: 100%;
+    background: linear-gradient(180deg, 
+        transparent 0%, 
+        var(--theme-color) 50%, 
+        transparent 100%);
+    opacity: 0.4;
+    z-index: 2;
 }
 
 .sidebar nav ul {
@@ -524,8 +664,11 @@ header h1 {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: var(--glass-blur-light);
+    -webkit-backdrop-filter: var(--glass-blur-light);
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    z-index: 3;
 }
 
 .sidebar .nav-link::before {
@@ -535,18 +678,17 @@ header h1 {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, 
-        rgba(255, 255, 255, 0.05) 0%, 
-        transparent 50%, 
-        rgba(255, 255, 255, 0.05) 100%);
+    background: var(--glass-highlight);
     opacity: 0;
     transition: opacity 0.3s ease;
+    z-index: -1;
 }
 
 .sidebar .nav-link:hover {
     background: rgba(37, 37, 37, 0.6);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    border-color: rgba(255, 255, 255, 0.1);
 }
 
 .sidebar .nav-link:hover::before {
@@ -557,15 +699,17 @@ header h1 {
     background: var(--accent-gradient);
     color: #121212;
     font-weight: bold;
-    box-shadow: 0 4px 16px rgba(102, 187, 106, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 6px 24px rgba(102, 187, 106, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
 }
 
 .sidebar .nav-link.active::before {
     background: linear-gradient(135deg, 
-        rgba(255, 255, 255, 0.1) 0%, 
-        transparent 50%, 
-        rgba(255, 255, 255, 0.1) 100%);
+        rgba(255, 255, 255, 0.15) 0%, 
+        rgba(255, 255, 255, 0.05) 50%, 
+        rgba(255, 255, 255, 0.15) 100%);
     opacity: 1;
 }
 
@@ -618,12 +762,24 @@ header h1 {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, 
-        rgba(255, 255, 255, 0.02) 0%, 
-        rgba(255, 255, 255, 0.05) 50%, 
-        rgba(255, 255, 255, 0.02) 100%);
+    background: var(--glass-highlight);
     pointer-events: none;
     border-radius: 16px;
+    z-index: 1;
+}
+
+.content-section section::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(var(--theme-color-rgb), 0.6) 50%, 
+        transparent 100%);
+    z-index: 2;
 }
 
 .content-section h2 {
@@ -693,7 +849,7 @@ header h1 {
     }
 }
 
-/* 頁尾 - 玻璃質感 */
+/* 頁尾 - 增強玻璃質感 */
 footer {
     text-align: center;
     padding: 1.5rem 0;
@@ -712,9 +868,22 @@ footer::before {
     top: 0;
     left: 0;
     right: 0;
+    bottom: 0;
+    background: var(--glass-highlight);
+    pointer-events: none;
+    z-index: 1;
+}
+
+footer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
     height: 1px;
     background: linear-gradient(90deg, transparent, var(--theme-color), transparent);
-    opacity: 0.3;
+    opacity: 0.4;
+    z-index: 2;
 }
 
 /* 響應式設計 - 大螢幕優化 */
@@ -851,14 +1020,16 @@ footer::before {
         flex-direction: column;
     }
 
-    /* 頁首優化 */
+    /* 頁首優化 - 增強玻璃質感 */
     header {
         padding: 1.5rem 1rem;
         position: sticky;
         top: 0;
         z-index: 100;
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: var(--glass-blur);
+        -webkit-backdrop-filter: var(--glass-blur);
+        background: var(--glass-bg);
+        box-shadow: var(--glass-shadow);
     }
     
     header h1 {
@@ -866,19 +1037,34 @@ footer::before {
         line-height: 1.2;
     }
 
-    /* 側邊欄改為水平導航 */
+    /* 側邊欄改為水平導航 - 增強玻璃質感 */
     .sidebar {
         width: 100%;
         border-right: none;
-        border-bottom: 1px solid #333;
+        border-bottom: 1px solid var(--glass-border);
         padding: 15px 10px;
-        background-color: rgba(26, 26, 26, 0.95);
+        background: var(--glass-bg);
         position: sticky;
         top: 0;
         z-index: 99;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
+        box-shadow: var(--glass-shadow);
+        backdrop-filter: var(--glass-blur);
+        -webkit-backdrop-filter: var(--glass-blur);
+    }
+    
+    .sidebar::before {
+        background: var(--glass-highlight);
+    }
+    
+    .sidebar::after {
+        top: auto;
+        bottom: 0;
+        width: 100%;
+        height: 1px;
+        background: linear-gradient(90deg, 
+            transparent 0%, 
+            var(--theme-color) 50%, 
+            transparent 100%);
     }
 
     .sidebar nav ul {
@@ -1057,15 +1243,16 @@ footer::before {
 
 /* 響應式設計 - 手機 */
 @media (max-width: 480px) {
-    /* 頁首手機優化 */
+    /* 頁首手機優化 - 增強玻璃質感 */
     header {
         padding: 1.2rem 0.8rem;
         position: sticky;
         top: 0;
         z-index: 100;
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        background-color: rgba(30, 30, 30, 0.95);
+        backdrop-filter: var(--glass-blur);
+        -webkit-backdrop-filter: var(--glass-blur);
+        background: var(--glass-bg);
+        box-shadow: var(--glass-shadow);
     }
     
     header h1 {
@@ -1074,15 +1261,17 @@ footer::before {
         letter-spacing: -0.5px;
     }
 
-    /* 導航欄手機優化 */
+    /* 導航欄手機優化 - 增強玻璃質感 */
     .sidebar {
         padding: 12px 8px;
         position: sticky;
         top: 0;
         z-index: 99;
-        background-color: rgba(26, 26, 26, 0.95);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
+        background: var(--glass-bg);
+        backdrop-filter: var(--glass-blur);
+        -webkit-backdrop-filter: var(--glass-blur);
+        box-shadow: var(--glass-shadow);
+        border-bottom: 1px solid var(--glass-border);
     }
     
     .sidebar nav ul {

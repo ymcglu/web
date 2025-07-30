@@ -1,4 +1,42 @@
 document.addEventListener("DOMContentLoaded", function () {
+  // 檢測 backdrop-filter 支援並應用降級處理
+  function detectBackdropFilterSupport() {
+    const testElement = document.createElement("div");
+    testElement.style.backdropFilter = "blur(1px)";
+    testElement.style.webkitBackdropFilter = "blur(1px)";
+
+    const supportsBackdropFilter =
+      testElement.style.backdropFilter !== "" ||
+      testElement.style.webkitBackdropFilter !== "";
+
+    if (!supportsBackdropFilter) {
+      document.documentElement.classList.add("no-backdrop-filter");
+      console.log("Backdrop-filter not supported, applying fallback styles");
+    }
+  }
+
+  // 動態調整玻璃效果強度
+  function adjustGlassEffectIntensity() {
+    // 檢測設備性能和偏好設定
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+    const isLowEndDevice =
+      navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 2;
+
+    if (prefersReducedMotion || isLowEndDevice) {
+      document.documentElement.style.setProperty("--glass-blur", "blur(8px)");
+      document.documentElement.style.setProperty(
+        "--glass-blur-light",
+        "blur(4px)"
+      );
+    }
+  }
+
+  // 立即執行檢測
+  detectBackdropFilterSupport();
+  adjustGlassEffectIntensity();
+
   const navLinks = document.querySelectorAll(".nav-link");
   const contentSections = document.querySelectorAll(".content-section");
   const whatToEatIframe = document.querySelector(
