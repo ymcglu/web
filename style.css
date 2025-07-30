@@ -227,8 +227,7 @@ body, html {
 
 /* 改善焦點指示器 */
 *:focus {
-    outline: 2px solid var(--theme-color);
-    outline-offset: 2px;
+    outline: none;
 }
 
 *:focus:not(:focus-visible) {
@@ -236,8 +235,7 @@ body, html {
 }
 
 *:focus-visible {
-    outline: 2px solid var(--theme-color);
-    outline-offset: 2px;
+    outline: none;
 }
 
 /* 觸控設備優化 */

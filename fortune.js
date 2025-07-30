@@ -628,7 +628,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const { lunarDate, upperGua, lowerGua, changingLineNum, calculation } =
         divination;
       divinationDetails = `
-            <div style="background: rgba(255,255,255,0.05); border-left: 4px solid ${luckyColorHex}; padding: 15px; margin: 15px 0; border-radius: 5px;">
+            <div style="background: rgba(255,255,255,0.05); padding: 15px; margin: 15px 0; border-radius: 5px;">
                 <h4 style="margin-top: 0; color: ${luckyColorHex};">🎯 今日時間起卦詳情</h4>
                 <p><strong>起卦時間：</strong>農曆${lunarDate.lunarYear}年${lunarDate.lunarMonth}月${lunarDate.lunarDay}日 ${calculation.timeBranch}時</p>
                 <p><strong>卦象組成：</strong>上${upperGua}卦 + 下${lowerGua}卦 = <strong>第${hexagramNumber}卦 ${hexagram.name}卦</strong></p>
@@ -637,7 +637,7 @@ document.addEventListener("DOMContentLoaded", function () {
             </div>`;
     } else {
       divinationDetails = `
-            <div style="background: rgba(255,255,255,0.05); border-left: 4px solid #888; padding: 15px; margin: 15px 0; border-radius: 5px;">
+            <div style="background: rgba(255,255,255,0.05); padding: 15px; margin: 15px 0; border-radius: 5px;">
                 <p style="color: #888; margin: 0; font-size: 0.9em;">※ 今日使用隨機起卦方式，如需時間起卦請重新整理頁面</p>
             </div>`;
     }
