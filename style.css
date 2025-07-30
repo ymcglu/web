@@ -1,10 +1,44 @@
 :root {
     --theme-color: #66bb6a; /* 預設主題色 */
+    --theme-color-rgb: 102, 187, 106; /* RGB 變數支援 */
+    --theme-secondary: #90ee90;
+    --theme-accent: #98fb98;
+    --glass-bg: rgba(30, 30, 30, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    --glass-blur: blur(16px);
+    --glass-accent: rgba(var(--theme-color-rgb), 0.15);
+    --accent-gradient: linear-gradient(135deg, var(--theme-color), rgba(var(--theme-color-rgb), 0.8));
+    --animation-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --animation-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-theme: 0.6s var(--animation-smooth);
+    
+    /* 色彩對比度相關變數 */
+    --text-on-theme: #ffffff;
+    --text-contrast-ratio: 4.5;
+    --theme-brightness: 0.5;
 }
 
 /* 基本設定: 深色主題 */
 * {
     box-sizing: border-box;
+}
+
+/* 主題切換過渡動畫 */
+:root {
+    transition: 
+        --theme-color var(--transition-theme),
+        --theme-color-rgb var(--transition-theme),
+        --glass-accent var(--transition-theme),
+        --accent-gradient var(--transition-theme);
+}
+
+/* 支援主題切換的元素 */
+header h1,
+.sidebar .nav-link.active,
+#daily-fortune h4,
+.content-section h2 {
+    transition: color var(--transition-theme), background var(--transition-theme);
 }
 
 html {
@@ -17,8 +51,8 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #121212; /* 主背景色 */
-    color: #e0e0e0; /* 主要文字顏色 */
+    background: radial-gradient(ellipse at center, #1a1a1a 0%, #121212 100%);
+    color: #e0e0e0;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
@@ -29,6 +63,21 @@ body {
     position: relative;
 }
 
+/* 添加微妙的背景紋理 */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(circle at 25% 25%, rgba(102, 187, 106, 0.02) 0%, transparent 50%),
+        radial-gradient(circle at 75% 75%, rgba(102, 187, 106, 0.01) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: -1;
+}
+
 /* 防止水平滾動 */
 body, html {
     max-width: 100%;
@@ -37,13 +86,15 @@ body, html {
 
 /* 改善文字選取體驗 */
 ::selection {
-    background-color: rgba(102, 187, 106, 0.3);
-    color: #ffffff;
+    background: linear-gradient(135deg, var(--theme-color), rgba(var(--theme-color-rgb), 0.6));
+    color: var(--text-on-theme);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 ::-moz-selection {
-    background-color: rgba(102, 187, 106, 0.3);
-    color: #ffffff;
+    background: linear-gradient(135deg, var(--theme-color), rgba(var(--theme-color-rgb), 0.6));
+    color: var(--text-on-theme);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 /* 改善焦點指示器 */
@@ -79,14 +130,29 @@ body, html {
     }
 }
 
-/* 頁首 */
+/* 頁首 - 玻璃質感 */
 header {
-    background-color: #1e1e1e; /* 頁首背景 */
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
     color: #e0e0e0;
     padding: 2rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    box-shadow: var(--glass-shadow);
     text-align: center;
-    border-bottom: 1px solid #333;
+    border-bottom: 1px solid var(--glass-border);
+    position: relative;
+    overflow: hidden;
+}
+
+header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--theme-color), transparent);
+    opacity: 0.6;
 }
 
 header h1 {
@@ -95,14 +161,33 @@ header h1 {
     color: var(--theme-color); /* 使用CSS變數 */
 }
 
-/* 每日運勢 */
+/* 每日運勢 - 玻璃質感 */
 #daily-fortune {
     margin-top: 1.5rem;
     padding: 20px;
-    background: linear-gradient(135deg, #1e1e1e, #252525); /* 區塊背景 */
-    border-radius: 12px;
-    border: 1px solid #333;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border-radius: 16px;
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    position: relative;
+    overflow: hidden;
+}
+
+#daily-fortune::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.02) 0%, 
+        rgba(255, 255, 255, 0.08) 50%, 
+        rgba(255, 255, 255, 0.02) 100%);
+    pointer-events: none;
+    border-radius: 16px;
 }
 
 /* 桌面版每日運勢優化 */
@@ -161,17 +246,36 @@ header h1 {
     font-size: 1.1rem;
 }
 
-/* 爻辭容器 */
+/* 爻辭容器 - 玻璃質感 */
 .yao-ci-container {
     display: flex;
     align-items: flex-start;
     gap: 20px;
     margin: 1em 0;
     padding: 15px;
-    background-color: #252525;
-    border: 1px dashed #ff7b72;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    background: rgba(37, 37, 37, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 123, 114, 0.3);
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    position: relative;
+    overflow: hidden;
+}
+
+.yao-ci-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, 
+        rgba(255, 123, 114, 0.05) 0%, 
+        transparent 50%, 
+        rgba(255, 123, 114, 0.05) 100%);
+    pointer-events: none;
+    border-radius: 12px;
 }
 
 /* 爻辭圖像區域 */
@@ -184,7 +288,7 @@ header h1 {
     padding: 4px;
 }
 
-/* ASCII卦象樣式 */
+/* ASCII卦象樣式 - 玻璃質感 */
 .hexagram-ascii {
     font-family: 'Courier New', 'Monaco', 'Menlo', 'Consolas', monospace;
     font-size: 16px;
@@ -192,20 +296,38 @@ header h1 {
     line-height: 1.4;
     margin: 0;
     padding: 12px 16px;
-    background: rgba(0,0,0,0.8);
-    border-radius: 6px;
-    border: 2px solid #ffd700;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 10px;
+    border: 2px solid rgba(255, 215, 0, 0.6);
     text-align: left;
     white-space: pre-line;
     font-weight: 500;
     letter-spacing: 0px;
     word-spacing: 0;
-    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.2);
+    box-shadow: 0 4px 16px rgba(255, 215, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
     min-width: 160px;
     width: 160px;
     height: auto;
     display: block;
     position: relative;
+    text-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
+}
+
+.hexagram-ascii::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, 
+        rgba(255, 215, 0, 0.05) 0%, 
+        transparent 50%, 
+        rgba(255, 215, 0, 0.05) 100%);
+    pointer-events: none;
+    border-radius: 8px;
 }
 
 /* 卦象中的爻字樣式 */
@@ -356,12 +478,30 @@ header h1 {
     flex: 1;
 }
 
-/* 側邊導覽列 */
+/* 側邊導覽列 - 玻璃質感 */
 .sidebar {
     width: 220px;
-    background-color: #1e1e1e; /* 側邊欄背景 */
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
     padding: 20px;
-    border-right: 1px solid #333;
+    border-right: 1px solid var(--glass-border);
+    position: relative;
+    overflow: hidden;
+}
+
+.sidebar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(180deg, 
+        rgba(255, 255, 255, 0.02) 0%, 
+        rgba(255, 255, 255, 0.01) 50%, 
+        rgba(255, 255, 255, 0.02) 100%);
+    pointer-events: none;
 }
 
 .sidebar nav ul {
@@ -377,21 +517,56 @@ header h1 {
 .sidebar .nav-link {
     display: block;
     padding: 12px 18px;
-    color: #e0e0e0; /* 連結文字顏色 */
+    color: #e0e0e0;
     text-decoration: none;
-    border-radius: 6px;
+    border-radius: 10px;
     font-size: 1.1rem;
-    transition: background-color 0.3s, color 0.3s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+.sidebar .nav-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.05) 0%, 
+        transparent 50%, 
+        rgba(255, 255, 255, 0.05) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
 .sidebar .nav-link:hover {
-    background-color: #252525; /* 懸停效果 */
+    background: rgba(37, 37, 37, 0.6);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.sidebar .nav-link:hover::before {
+    opacity: 1;
 }
 
 .sidebar .nav-link.active {
-    background-color: var(--theme-color); /* 使用CSS變數 */
-    color: #121212; /* 啟用中連結文字 */
+    background: var(--accent-gradient);
+    color: #121212;
     font-weight: bold;
+    box-shadow: 0 4px 16px rgba(102, 187, 106, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar .nav-link.active::before {
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.1) 0%, 
+        transparent 50%, 
+        rgba(255, 255, 255, 0.1) 100%);
+    opacity: 1;
 }
 
 /* 內容顯示區 */
@@ -424,12 +599,31 @@ header h1 {
 }
 
 .content-section section {
-    background: #1e1e1e; /* 內容區塊背景 */
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
     padding: 25px;
     margin-bottom: 25px;
-    border-radius: 8px;
-    border: 1px solid #333;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    border-radius: 16px;
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    position: relative;
+    overflow: hidden;
+}
+
+.content-section section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.02) 0%, 
+        rgba(255, 255, 255, 0.05) 50%, 
+        rgba(255, 255, 255, 0.02) 100%);
+    pointer-events: none;
+    border-radius: 16px;
 }
 
 .content-section h2 {
@@ -499,13 +693,28 @@ header h1 {
     }
 }
 
-/* 頁尾 */
+/* 頁尾 - 玻璃質感 */
 footer {
     text-align: center;
     padding: 1.5rem 0;
-    background-color: #1e1e1e;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
     color: #a0a0a0;
-    border-top: 1px solid #333;
+    border-top: 1px solid var(--glass-border);
+    position: relative;
+    overflow: hidden;
+}
+
+footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--theme-color), transparent);
+    opacity: 0.3;
 }
 
 /* 響應式設計 - 大螢幕優化 */
@@ -1263,16 +1472,37 @@ footer {
     }
 }
 
-/* 即時占卜區塊樣式 */
+/* 即時占卜區塊樣式 - 玻璃質感 */
 #divination-input {
     display: flex;
     flex-wrap: wrap;
-    gap: 15px; /* 增加元素間距 */
+    gap: 15px;
     align-items: center;
-    background-color: #252525;
+    background: rgba(37, 37, 37, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     padding: 20px;
-    border-radius: 8px;
+    border-radius: 16px;
     margin-bottom: 20px;
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    position: relative;
+    overflow: hidden;
+}
+
+#divination-input::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, 
+        rgba(102, 187, 106, 0.03) 0%, 
+        transparent 50%, 
+        rgba(102, 187, 106, 0.03) 100%);
+    pointer-events: none;
+    border-radius: 16px;
 }
 
 #divination-input p {
@@ -1284,39 +1514,98 @@ footer {
 
 #divination-input input,
 #divination-input select {
-    background-color: #333;
+    background: rgba(51, 51, 51, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     color: #e0e0e0;
-    border: 1px solid #555;
-    border-radius: 5px;
+    border: 1px solid rgba(85, 85, 85, 0.6);
+    border-radius: 10px;
     padding: 12px;
     font-size: 1rem;
-    flex-grow: 1; /* 讓輸入框自動填滿空間 */
+    flex-grow: 1;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+#divination-input input:focus,
+#divination-input select:focus {
+    outline: none;
+    border-color: var(--theme-color);
+    box-shadow: 0 0 0 2px rgba(102, 187, 106, 0.2), 0 4px 12px rgba(0, 0, 0, 0.2);
+    background: rgba(51, 51, 51, 0.9);
 }
 
 #divination-input button {
-    background-color: var(--theme-color);
+    background: var(--accent-gradient);
     color: #121212;
-    border: none;
+    border: 1px solid rgba(255, 255, 255, 0.1);
     padding: 12px 20px;
-    border-radius: 5px;
+    border-radius: 12px;
     cursor: pointer;
     font-size: 1rem;
     font-weight: bold;
-    transition: background-color 0.3s, transform 0.1s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     flex-grow: 1;
+    box-shadow: 0 4px 16px rgba(102, 187, 106, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+#divination-input button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.1) 0%, 
+        transparent 50%, 
+        rgba(255, 255, 255, 0.1) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
 #divination-input button:hover {
-    background-color: #88dd88; /* 懸停時的亮綠色 */
     transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 187, 106, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+#divination-input button:hover::before {
+    opacity: 1;
+}
+
+#divination-input button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(102, 187, 106, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 #divination-result {
     margin-top: 20px;
     padding: 20px;
-    background: #1e1e1e;
-    border-radius: 8px;
-    border: 1px solid #333;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border-radius: 16px;
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    position: relative;
+    overflow: hidden;
+}
+
+#divination-result::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.02) 0%, 
+        rgba(255, 255, 255, 0.05) 50%, 
+        rgba(255, 255, 255, 0.02) 100%);
+    pointer-events: none;
+    border-radius: 16px;
 }
 
 #divination-result h3 {
@@ -1348,6 +1637,21 @@ footer {
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+@keyframes glassShimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+@keyframes pulseGlow {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-5px); }
 }
 
 /* 圖片和媒體優化 */

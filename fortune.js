@@ -91,6 +91,7 @@ document.addEventListener("DOMContentLoaded", function () {
     };
   }
 
+  // 色彩對比度檢測和自動調整機制
   function getContrastingTextColor(hexColor) {
     if (hexColor.startsWith("#")) {
       hexColor = hexColor.slice(1);
@@ -100,6 +101,153 @@ document.addEventListener("DOMContentLoaded", function () {
     const b = parseInt(hexColor.substring(4, 6), 16);
     const brightness = (r * 299 + g * 587 + b * 114) / 1000;
     return brightness > 128 ? "#000000" : "#FFFFFF";
+  }
+
+  // 計算色彩對比度比例 (WCAG 標準)
+  function calculateContrastRatio(color1, color2) {
+    const getLuminance = (hex) => {
+      if (hex.startsWith("#")) hex = hex.slice(1);
+      const r = parseInt(hex.substring(0, 2), 16) / 255;
+      const g = parseInt(hex.substring(2, 4), 16) / 255;
+      const b = parseInt(hex.substring(4, 6), 16) / 255;
+
+      const toLinear = (c) =>
+        c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+
+      return 0.2126 * toLinear(r) + 0.7152 * toLinear(g) + 0.0722 * toLinear(b);
+    };
+
+    const lum1 = getLuminance(color1);
+    const lum2 = getLuminance(color2);
+    const brightest = Math.max(lum1, lum2);
+    const darkest = Math.min(lum1, lum2);
+
+    return (brightest + 0.05) / (darkest + 0.05);
+  }
+
+  // 自動調整色彩以符合對比度要求
+  function adjustColorForContrast(
+    hexColor,
+    backgroundColor = "#121212",
+    targetRatio = 4.5
+  ) {
+    let currentRatio = calculateContrastRatio(hexColor, backgroundColor);
+
+    if (currentRatio >= targetRatio) {
+      return hexColor;
+    }
+
+    // 如果對比度不足，調整亮度
+    const rgb = hexToRgb(hexColor);
+    const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+
+    // 根據背景色決定調整方向
+    const isBackgroundDark =
+      calculateContrastRatio("#ffffff", backgroundColor) >
+      calculateContrastRatio("#000000", backgroundColor);
+
+    let adjustedL = hsl.l;
+    const step = 0.05;
+    const maxIterations = 20;
+    let iterations = 0;
+
+    while (currentRatio < targetRatio && iterations < maxIterations) {
+      if (isBackgroundDark) {
+        adjustedL = Math.min(1, adjustedL + step);
+      } else {
+        adjustedL = Math.max(0, adjustedL - step);
+      }
+
+      const adjustedRgb = hslToRgb(hsl.h, hsl.s, adjustedL);
+      const adjustedHex = rgbToHex(adjustedRgb.r, adjustedRgb.g, adjustedRgb.b);
+      currentRatio = calculateContrastRatio(adjustedHex, backgroundColor);
+
+      if (currentRatio >= targetRatio) {
+        return adjustedHex;
+      }
+
+      iterations++;
+    }
+
+    return hexColor; // 如果無法調整到目標對比度，返回原色
+  }
+
+  // 輔助函數：hex 轉 rgb
+  function hexToRgb(hex) {
+    if (hex.startsWith("#")) hex = hex.slice(1);
+    return {
+      r: parseInt(hex.substring(0, 2), 16),
+      g: parseInt(hex.substring(2, 4), 16),
+      b: parseInt(hex.substring(4, 6), 16),
+    };
+  }
+
+  // 輔助函數：rgb 轉 hex
+  function rgbToHex(r, g, b) {
+    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+  }
+
+  // 輔助函數：rgb 轉 hsl
+  function rgbToHsl(r, g, b) {
+    r /= 255;
+    g /= 255;
+    b /= 255;
+    const max = Math.max(r, g, b),
+      min = Math.min(r, g, b);
+    let h,
+      s,
+      l = (max + min) / 2;
+
+    if (max === min) {
+      h = s = 0;
+    } else {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r:
+          h = (g - b) / d + (g < b ? 6 : 0);
+          break;
+        case g:
+          h = (b - r) / d + 2;
+          break;
+        case b:
+          h = (r - g) / d + 4;
+          break;
+      }
+      h /= 6;
+    }
+
+    return { h, s, l };
+  }
+
+  // 輔助函數：hsl 轉 rgb
+  function hslToRgb(h, s, l) {
+    let r, g, b;
+
+    if (s === 0) {
+      r = g = b = l;
+    } else {
+      const hue2rgb = (p, q, t) => {
+        if (t < 0) t += 1;
+        if (t > 1) t -= 1;
+        if (t < 1 / 6) return p + (q - p) * 6 * t;
+        if (t < 1 / 2) return q;
+        if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+        return p;
+      };
+
+      const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+      const p = 2 * l - q;
+      r = hue2rgb(p, q, h + 1 / 3);
+      g = hue2rgb(p, q, h);
+      b = hue2rgb(p, q, h - 1 / 3);
+    }
+
+    return {
+      r: Math.round(r * 255),
+      g: Math.round(g * 255),
+      b: Math.round(b * 255),
+    };
   }
 
   // =========================================================================
@@ -372,16 +520,94 @@ document.addEventListener("DOMContentLoaded", function () {
     const dailyColor = guaColors[palaceGua];
     let themeColorHex = dailyColor.hex;
 
-    if (themeColorHex === "#2C3539") {
-      themeColorHex = "#FFFFFF";
-    }
+    // 動態主題色彩切換邏輯，支援 RGB 變數
+    const adjustedThemeColor = adjustColorForContrast(
+      themeColorHex,
+      "#121212",
+      4.5
+    );
+    const themeRgb = dailyColor.rgb;
 
-    window.dailyThemeColor = themeColorHex; // Store color globally
-    document.documentElement.style.setProperty("--theme-color", themeColorHex);
+    // 設定主題色彩變數
+    window.dailyThemeColor = adjustedThemeColor;
+    document.documentElement.style.setProperty(
+      "--theme-color",
+      adjustedThemeColor
+    );
+    document.documentElement.style.setProperty("--theme-color-rgb", themeRgb);
+
+    // 計算並設定對比色
+    const contrastColor = getContrastingTextColor(adjustedThemeColor);
+    document.documentElement.style.setProperty(
+      "--text-on-theme",
+      contrastColor
+    );
+
+    // 計算主題色亮度
+    const themeBrightness =
+      calculateContrastRatio("#ffffff", adjustedThemeColor) >
+      calculateContrastRatio("#000000", adjustedThemeColor)
+        ? 0.3
+        : 0.7;
+    document.documentElement.style.setProperty(
+      "--theme-brightness",
+      themeBrightness
+    );
+
+    // 設定玻璃質感相關變數 (使用 RGB 變數)
+    document.documentElement.style.setProperty(
+      "--glass-accent",
+      `rgba(${themeRgb}, 0.15)`
+    );
+
+    // 設定漸變變數 (使用 RGB 變數)
+    document.documentElement.style.setProperty(
+      "--accent-gradient",
+      `linear-gradient(135deg, var(--theme-color), rgba(${themeRgb}, 0.8))`
+    );
+
+    // 設定次要色彩
+    const secondaryRgb = themeRgb
+      .split(",")
+      .map((n) => Math.min(255, parseInt(n.trim()) + 30))
+      .join(", ");
+    document.documentElement.style.setProperty(
+      "--theme-secondary",
+      `rgb(${secondaryRgb})`
+    );
+
+    // 設定強調色彩
+    const accentRgb = themeRgb
+      .split(",")
+      .map((n) => Math.min(255, parseInt(n.trim()) + 50))
+      .join(", ");
+    document.documentElement.style.setProperty(
+      "--theme-accent",
+      `rgb(${accentRgb})`
+    );
 
     const luckyColorName = dailyColor.name;
-    const luckyColorHex = dailyColor.hex;
-    const textColor = getContrastingTextColor(luckyColorHex);
+    const luckyColorHex = adjustedThemeColor;
+    const textColor = contrastColor;
+
+    // 同步 iframe 主題
+    const iframes = document.querySelectorAll("iframe");
+    iframes.forEach((iframe) => {
+      try {
+        iframe.contentWindow.postMessage(
+          {
+            type: "themeUpdate",
+            themeColor: adjustedThemeColor,
+            themeColorRgb: themeRgb,
+            glassAccent: `rgba(${themeRgb}, 0.15)`,
+            contrastColor: contrastColor,
+          },
+          "*"
+        );
+      } catch (e) {
+        // 跨域 iframe 無法訪問，忽略錯誤
+      }
+    });
 
     const astroTheme = astroData
       ? astroData.description

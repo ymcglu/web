@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Color System Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #121212;
+        color: #e0e0e0;
+        padding: 20px;
+      }
+      .test-section {
+        margin: 20px 0;
+        padding: 15px;
+        border: 1px solid #333;
+        border-radius: 8px;
+      }
+      .color-sample {
+        display: inline-block;
+        width: 100px;
+        height: 50px;
+        margin: 5px;
+        text-align: center;
+        line-height: 50px;
+        border-radius: 4px;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Color System Test</h1>
+
+    <div class="test-section">
+      <h2>Original Gua Colors</h2>
+      <div id="original-colors"></div>
+    </div>
+
+    <div class="test-section">
+      <h2>Adjusted Colors (WCAG AA Compliant)</h2>
+      <div id="adjusted-colors"></div>
+    </div>
+
+    <div class="test-section">
+      <h2>Contrast Ratios</h2>
+      <div id="contrast-ratios"></div>
+    </div>
+
+    <script src="database/database.js"></script>
+    <script>
+      // Copy the color functions from fortune.js for testing
+      function getContrastingTextColor(hexColor) {
+        if (hexColor.startsWith("#")) {
+          hexColor = hexColor.slice(1);
+        }
+        const r = parseInt(hexColor.substring(0, 2), 16);
+        const g = parseInt(hexColor.substring(2, 4), 16);
+        const b = parseInt(hexColor.substring(4, 6), 16);
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        return brightness > 128 ? "#000000" : "#FFFFFF";
+      }
+
+      function calculateContrastRatio(color1, color2) {
+        const getLuminance = (hex) => {
+          if (hex.startsWith("#")) hex = hex.slice(1);
+          const r = parseInt(hex.substring(0, 2), 16) / 255;
+          const g = parseInt(hex.substring(2, 4), 16) / 255;
+          const b = parseInt(hex.substring(4, 6), 16) / 255;
+
+          const toLinear = (c) =>
+            c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+
+          return (
+            0.2126 * toLinear(r) + 0.7152 * toLinear(g) + 0.0722 * toLinear(b)
+          );
+        };
+
+        const lum1 = getLuminance(color1);
+        const lum2 = getLuminance(color2);
+        const brightest = Math.max(lum1, lum2);
+        const darkest = Math.min(lum1, lum2);
+
+        return (brightest + 0.05) / (darkest + 0.05);
+      }
+
+      function hexToRgb(hex) {
+        if (hex.startsWith("#")) hex = hex.slice(1);
+        return {
+          r: parseInt(hex.substring(0, 2), 16),
+          g: parseInt(hex.substring(2, 4), 16),
+          b: parseInt(hex.substring(4, 6), 16),
+        };
+      }
+
+      function rgbToHex(r, g, b) {
+        return (
+          "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)
+        );
+      }
+
+      function rgbToHsl(r, g, b) {
+        r /= 255;
+        g /= 255;
+        b /= 255;
+        const max = Math.max(r, g, b),
+          min = Math.min(r, g, b);
+        let h,
+          s,
+          l = (max + min) / 2;
+
+        if (max === min) {
+          h = s = 0;
+        } else {
+          const d = max - min;
+          s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+          switch (max) {
+            case r:
+              h = (g - b) / d + (g < b ? 6 : 0);
+              break;
+            case g:
+              h = (b - r) / d + 2;
+              break;
+            case b:
+              h = (r - g) / d + 4;
+              break;
+          }
+          h /= 6;
+        }
+
+        return { h, s, l };
+      }
+
+      function hslToRgb(h, s, l) {
+        let r, g, b;
+
+        if (s === 0) {
+          r = g = b = l;
+        } else {
+          const hue2rgb = (p, q, t) => {
+            if (t < 0) t += 1;
+            if (t > 1) t -= 1;
+            if (t < 1 / 6) return p + (q - p) * 6 * t;
+            if (t < 1 / 2) return q;
+            if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+            return p;
+          };
+
+          const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+          const p = 2 * l - q;
+          r = hue2rgb(p, q, h + 1 / 3);
+          g = hue2rgb(p, q, h);
+          b = hue2rgb(p, q, h - 1 / 3);
+        }
+
+        return {
+          r: Math.round(r * 255),
+          g: Math.round(g * 255),
+          b: Math.round(b * 255),
+        };
+      }
+
+      function adjustColorForContrast(
+        hexColor,
+        backgroundColor = "#121212",
+        targetRatio = 4.5
+      ) {
+        let currentRatio = calculateContrastRatio(hexColor, backgroundColor);
+
+        if (currentRatio >= targetRatio) {
+          return hexColor;
+        }
+
+        const rgb = hexToRgb(hexColor);
+        const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+
+        const isBackgroundDark =
+          calculateContrastRatio("#ffffff", backgroundColor) >
+          calculateContrastRatio("#000000", backgroundColor);
+
+        let adjustedL = hsl.l;
+        const step = 0.05;
+        const maxIterations = 20;
+        let iterations = 0;
+
+        while (currentRatio < targetRatio && iterations < maxIterations) {
+          if (isBackgroundDark) {
+            adjustedL = Math.min(1, adjustedL + step);
+          } else {
+            adjustedL = Math.max(0, adjustedL - step);
+          }
+
+          const adjustedRgb = hslToRgb(hsl.h, hsl.s, adjustedL);
+          const adjustedHex = rgbToHex(
+            adjustedRgb.r,
+            adjustedRgb.g,
+            adjustedRgb.b
+          );
+          currentRatio = calculateContrastRatio(adjustedHex, backgroundColor);
+
+          if (currentRatio >= targetRatio) {
+            return adjustedHex;
+          }
+
+          iterations++;
+        }
+
+        return hexColor;
+      }
+
+      // Test the color system
+      const originalColorsDiv = document.getElementById("original-colors");
+      const adjustedColorsDiv = document.getElementById("adjusted-colors");
+      const contrastRatiosDiv = document.getElementById("contrast-ratios");
+
+      Object.entries(guaColors).forEach(([gua, colorData]) => {
+        const originalColor = colorData.hex;
+        const adjustedColor = adjustColorForContrast(originalColor);
+        const originalRatio = calculateContrastRatio(originalColor, "#121212");
+        const adjustedRatio = calculateContrastRatio(adjustedColor, "#121212");
+
+        // Original color sample
+        const originalSample = document.createElement("div");
+        originalSample.className = "color-sample";
+        originalSample.style.backgroundColor = originalColor;
+        originalSample.style.color = getContrastingTextColor(originalColor);
+        originalSample.textContent = gua;
+        originalSample.title = `${colorData.name}: ${originalColor}`;
+        originalColorsDiv.appendChild(originalSample);
+
+        // Adjusted color sample
+        const adjustedSample = document.createElement("div");
+        adjustedSample.className = "color-sample";
+        adjustedSample.style.backgroundColor = adjustedColor;
+        adjustedSample.style.color = getContrastingTextColor(adjustedColor);
+        adjustedSample.textContent = gua;
+        adjustedSample.title = `${colorData.name}: ${adjustedColor}`;
+        adjustedColorsDiv.appendChild(adjustedSample);
+
+        // Contrast ratio info
+        const ratioInfo = document.createElement("div");
+        ratioInfo.innerHTML = `
+                <strong>${gua} (${colorData.name}):</strong><br>
+                原始: ${originalColor} (對比度: ${originalRatio.toFixed(2)})<br>
+                調整: ${adjustedColor} (對比度: ${adjustedRatio.toFixed(2)})<br>
+                RGB: ${colorData.rgb}<br>
+                ${
+                  adjustedRatio >= 4.5 ? "✅ WCAG AA 合規" : "❌ 對比度不足"
+                }<br><br>
+            `;
+        contrastRatiosDiv.appendChild(ratioInfo);
+      });
+    </script>
+  </body>
+</html>

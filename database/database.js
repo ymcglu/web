@@ -14,14 +14,54 @@ const earthlyBranchNumbers = {
 };
 
 const guaColors = {
-  乾: { name: "天界金", hex: "#E5E4E2" },
-  兌: { name: "澤光銀", hex: "#C0C0C0" },
-  離: { name: "烈焰紅", hex: "#E34234" },
-  震: { name: "春雷綠", hex: "#66bb6a" },
-  巽: { name: "風信青", hex: "#008080" },
-  坎: { name: "深淵黑", hex: "#2C3539" },
-  艮: { name: "山石黃", hex: "#DAA520" },
-  坤: { name: "大地棕", hex: "#8B4513" },
+  乾: {
+    name: "天界金",
+    hex: "#E5E4E2",
+    rgb: "229, 228, 226",
+    glassBg: "rgba(229, 228, 226, 0.15)",
+  },
+  兌: {
+    name: "澤光銀",
+    hex: "#C0C0C0",
+    rgb: "192, 192, 192",
+    glassBg: "rgba(192, 192, 192, 0.15)",
+  },
+  離: {
+    name: "烈焰紅",
+    hex: "#E34234",
+    rgb: "227, 66, 52",
+    glassBg: "rgba(227, 66, 52, 0.15)",
+  },
+  震: {
+    name: "春雷綠",
+    hex: "#66bb6a",
+    rgb: "102, 187, 106",
+    glassBg: "rgba(102, 187, 106, 0.15)",
+  },
+  巽: {
+    name: "風信青",
+    hex: "#008080",
+    rgb: "0, 128, 128",
+    glassBg: "rgba(0, 128, 128, 0.15)",
+  },
+  坎: {
+    name: "深淵藍",
+    hex: "#4682B4",
+    rgb: "70, 130, 180",
+    glassBg: "rgba(70, 130, 180, 0.15)",
+  },
+  艮: {
+    name: "山石黃",
+    hex: "#DAA520",
+    rgb: "218, 165, 32",
+    glassBg: "rgba(218, 165, 32, 0.15)",
+  },
+  坤: {
+    name: "大地棕",
+    hex: "#8B4513",
+    rgb: "139, 69, 19",
+    glassBg: "rgba(139, 69, 19, 0.15)",
+  },
 };
 
 const hexagramData = {
@@ -3689,6 +3729,29 @@ const checkPrimalBaguaMap = () => {
   return true;
 };
 
+// 獲取對比色函數
+function getContrastColor(hexColor) {
+  const hex = hexColor.replace("#", "");
+  const r = parseInt(hex.substr(0, 2), 16);
+  const g = parseInt(hex.substr(2, 2), 16);
+  const b = parseInt(hex.substr(4, 2), 16);
+  const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+  return brightness > 128 ? "#000000" : "#FFFFFF";
+}
+
+// 獲取增強的主題色函數
+function getEnhancedThemeColor(guaName) {
+  const baseColor = guaColors[guaName];
+  if (!baseColor) return guaColors["震"];
+
+  return {
+    ...baseColor,
+    contrast: getContrastColor(baseColor.hex),
+    shadow: `0 0 20px ${baseColor.hex}30`,
+    gradient: `linear-gradient(135deg, ${baseColor.hex}, ${baseColor.hex}CC)`,
+  };
+}
+
 if (typeof module !== "undefined" && module.exports) {
   module.exports = {
     earthlyBranchNumbers,
@@ -3699,6 +3762,8 @@ if (typeof module !== "undefined" && module.exports) {
     iChingPalace,
     primalBaguaMap,
     yaoDetailsExplanations,
+    getContrastColor,
+    getEnhancedThemeColor,
   };
 }
 

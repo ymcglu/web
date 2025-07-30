@@ -1,0 +1,375 @@
+/* ===== 智慧運勢系統 UI 設計改進建議 ===== */
+
+/* 1. 增強文化韻味 - 傳統紋樣背景 */
+.cultural-background {
+  position: relative;
+  overflow: hidden;
+}
+
+.cultural-background::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 25% 25%, rgba(102, 187, 106, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(102, 187, 106, 0.03) 0%, transparent 50%);
+  background-size: 200px 200px;
+  pointer-events: none;
+  opacity: 0.4;
+}
+
+/* 2. 卦象區域視覺升級 */
+.enhanced-hexagram-container {
+  background: linear-gradient(135deg, 
+    rgba(0, 0, 0, 0.8) 0%, 
+    rgba(30, 30, 30, 0.9) 50%, 
+    rgba(0, 0, 0, 0.8) 100%);
+  border: 2px solid;
+  border-image: linear-gradient(45deg, var(--theme-color), transparent, var(--theme-color)) 1;
+  border-radius: 16px;
+  padding: 24px;
+  margin: 20px 0;
+  position: relative;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.enhanced-hexagram-container::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, var(--theme-color), transparent, var(--theme-color));
+  border-radius: 16px;
+  z-index: -1;
+  animation: borderGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes borderGlow {
+  0% { opacity: 0.5; }
+  100% { opacity: 0.8; }
+}
+
+/* 3. 現代化卦象設計 */
+.modern-hexagram {
+  font-family: 'SF Mono', 'Monaco', 'Cascadia Code', 'Roboto Mono', monospace;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--theme-color);
+  line-height: 1.2;
+  text-align: center;
+  padding: 20px;
+  background: radial-gradient(circle, rgba(0, 0, 0, 0.9) 0%, rgba(20, 20, 20, 0.95) 100%);
+  border-radius: 12px;
+  border: 2px solid var(--theme-color);
+  box-shadow: 
+    0 0 20px rgba(var(--theme-color-rgb), 0.3),
+    inset 0 2px 4px rgba(255, 255, 255, 0.1);
+  position: relative;
+  min-width: 180px;
+  backdrop-filter: blur(10px);
+}
+
+.modern-hexagram::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 120%;
+  height: 120%;
+  background: radial-gradient(circle, rgba(var(--theme-color-rgb), 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  z-index: -1;
+  animation: pulseGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes pulseGlow {
+  0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.3; }
+  100% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.1; }
+}
+
+/* 4. 提升爻辭區域設計 */
+.enhanced-yaoci-container {
+  background: linear-gradient(135deg, 
+    rgba(37, 37, 37, 0.9) 0%, 
+    rgba(45, 45, 45, 0.95) 50%, 
+    rgba(37, 37, 37, 0.9) 100%);
+  border: 1px solid rgba(var(--theme-color-rgb), 0.3);
+  border-radius: 16px;
+  padding: 24px;
+  margin: 24px 0;
+  position: relative;
+  backdrop-filter: blur(15px);
+  box-shadow: 
+    0 12px 24px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.enhanced-yaoci-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    var(--theme-color), 
+    transparent);
+  opacity: 0.6;
+}
+
+.yaoci-text {
+  font-size: 1.4em;
+  font-weight: 700;
+  color: #ff7b72;
+  line-height: 1.6;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.yaoci-text::before {
+  content: '"';
+  font-size: 2em;
+  color: var(--theme-color);
+  opacity: 0.3;
+  position: absolute;
+  left: -20px;
+  top: -10px;
+}
+
+.yaoci-text::after {
+  content: '"';
+  font-size: 2em;
+  color: var(--theme-color);
+  opacity: 0.3;
+  position: absolute;
+  right: -20px;
+  bottom: -25px;
+}
+
+/* 5. 色彩系統增強 */
+:root {
+  --theme-color-rgb: 102, 187, 106; /* 預設值，會被動態更新 */
+  --gradient-primary: linear-gradient(135deg, var(--theme-color) 0%, rgba(var(--theme-color-rgb), 0.8) 100%);
+  --gradient-secondary: linear-gradient(135deg, rgba(var(--theme-color-rgb), 0.1) 0%, transparent 100%);
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
+}
+
+/* 6. 現代化按鈕設計 */
+.enhanced-button {
+  background: var(--gradient-primary);
+  color: #000;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 28px;
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 
+    0 4px 15px rgba(var(--theme-color-rgb), 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.enhanced-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.6s;
+}
+
+.enhanced-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 8px 25px rgba(var(--theme-color-rgb), 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.enhanced-button:hover::before {
+  left: 100%;
+}
+
+.enhanced-button:active {
+  transform: translateY(0);
+  transition: transform 0.1s;
+}
+
+/* 7. 玻璃質感卡片 */
+.glass-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.3), 
+    transparent);
+}
+
+/* 8. 流動動畫背景 */
+.flowing-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  z-index: -1;
+}
+
+.flowing-background::before,
+.flowing-background::after {
+  content: '';
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(var(--theme-color-rgb), 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: float 6s ease-in-out infinite;
+}
+
+.flowing-background::before {
+  top: 20%;
+  left: 10%;
+  animation-delay: 0s;
+}
+
+.flowing-background::after {
+  bottom: 20%;
+  right: 10%;
+  animation-delay: 3s;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateX(0) translateY(0) scale(1); }
+  25% { transform: translateX(20px) translateY(-20px) scale(1.1); }
+  50% { transform: translateX(-10px) translateY(30px) scale(0.9); }
+  75% { transform: translateX(30px) translateY(-10px) scale(1.05); }
+}
+
+/* 9. 文字漸變效果 */
+.gradient-text {
+  background: linear-gradient(135deg, var(--theme-color) 0%, rgba(var(--theme-color-rgb), 0.7) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+}
+
+/* 10. 載入動畫優化 */
+.enhanced-loading {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(var(--theme-color-rgb), 0.3);
+  border-radius: 50%;
+  border-top-color: var(--theme-color);
+  animation: spin 1s linear infinite;
+  box-shadow: 0 0 20px rgba(var(--theme-color-rgb), 0.3);
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* 11. 響應式增強 */
+@media (max-width: 768px) {
+  .enhanced-hexagram-container {
+    padding: 16px;
+    border-radius: 12px;
+  }
+  
+  .modern-hexagram {
+    font-size: 14px;
+    padding: 16px;
+    min-width: 140px;
+  }
+  
+  .enhanced-yaoci-container {
+    padding: 16px;
+    border-radius: 12px;
+  }
+  
+  .yaoci-text {
+    font-size: 1.2em;
+  }
+}
+
+/* 12. 深色模式優化 */
+@media (prefers-color-scheme: dark) {
+  .glass-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  
+  .enhanced-hexagram-container {
+    background: linear-gradient(135deg, 
+      rgba(0, 0, 0, 0.9) 0%, 
+      rgba(15, 15, 15, 0.95) 50%, 
+      rgba(0, 0, 0, 0.9) 100%);
+  }
+}
+
+/* 13. 無障礙優化 */
+@media (prefers-reduced-motion: reduce) {
+  .enhanced-hexagram-container::after,
+  .modern-hexagram::before,
+  .flowing-background::before,
+  .flowing-background::after,
+  .enhanced-loading {
+    animation: none;
+  }
+  
+  .enhanced-button {
+    transition: none;
+  }
+}
+
+/* 14. 高對比度模式 */
+@media (prefers-contrast: high) {
+  .glass-card,
+  .enhanced-hexagram-container,
+  .enhanced-yaoci-container {
+    background: #000;
+    border: 2px solid #fff;
+  }
+  
+  .modern-hexagram {
+    background: #000;
+    border: 2px solid var(--theme-color);
+    box-shadow: none;
+  }
+}
