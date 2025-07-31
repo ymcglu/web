@@ -36,11 +36,24 @@
           <ul role="tablist">
             <li role="presentation">
               <a
-                href="#daily-fortune-content"
+                href="#lunar-time-content"
                 class="nav-link active"
-                data-target="daily-fortune-content"
+                data-target="lunar-time-content"
                 role="tab"
                 aria-selected="true"
+                aria-controls="lunar-time-content"
+                id="tab-lunar-time"
+              >
+                時辰吉凶
+              </a>
+            </li>
+            <li role="presentation">
+              <a
+                href="#daily-fortune-content"
+                class="nav-link"
+                data-target="daily-fortune-content"
+                role="tab"
+                aria-selected="false"
                 aria-controls="daily-fortune-content"
                 id="tab-daily-fortune"
               >
@@ -60,30 +73,33 @@
                 美食推薦
               </a>
             </li>
-            <li role="presentation">
-              <a
-                href="#lunar-time-content"
-                class="nav-link"
-                data-target="lunar-time-content"
-                role="tab"
-                aria-selected="false"
-                aria-controls="lunar-time-content"
-                id="tab-lunar-time"
-              >
-                時辰吉凶
-              </a>
-            </li>
           </ul>
         </nav>
       </aside>
 
       <main class="content-area" role="main" id="main-content">
         <div
-          id="daily-fortune-content"
+          id="lunar-time-content"
           class="content-section active"
+          role="tabpanel"
+          aria-labelledby="tab-lunar-time"
+          tabindex="0"
+        >
+          <iframe
+            src="lunar-time/lunar_time.html"
+            class="content-iframe"
+            title="時辰吉凶查詢"
+            loading="lazy"
+          ></iframe>
+        </div>
+
+        <div
+          id="daily-fortune-content"
+          class="content-section"
           role="tabpanel"
           aria-labelledby="tab-daily-fortune"
           tabindex="0"
+          aria-hidden="true"
         >
           <section id="daily-fortune" aria-label="每日運勢內容">
             <h2>每日運勢與指導</h2>
@@ -103,22 +119,6 @@
             src="eat/what_to_eat.html"
             class="content-iframe"
             title="美食推薦工具"
-            loading="lazy"
-          ></iframe>
-        </div>
-
-        <div
-          id="lunar-time-content"
-          class="content-section"
-          role="tabpanel"
-          aria-labelledby="tab-lunar-time"
-          tabindex="0"
-          aria-hidden="true"
-        >
-          <iframe
-            src="lunar-time/lunar_time.html"
-            class="content-iframe"
-            title="時辰吉凶查詢"
             loading="lazy"
           ></iframe>
         </div>
