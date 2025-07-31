@@ -1735,6 +1735,14 @@ footer::before {
     transition: border-color 0.3s ease;
   }
 
+  /* 手機版完全移除 select 所有箭頭 */
+  #divination-input select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: none;
+  }
+
   #divination-input input:focus,
   #divination-input select:focus {
     outline: none;
@@ -1934,6 +1942,14 @@ footer::before {
     transition: all 0.3s ease;
   }
 
+  /* 平板版完全移除 select 所有箭頭 */
+  #divination-input select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: none;
+  }
+
   #divination-input input:focus,
   #divination-input select:focus {
     outline: none;
@@ -2039,6 +2055,14 @@ footer::before {
   #divination-input button {
     padding: 10px;
     font-size: 0.9rem;
+  }
+
+  /* 小螢幕完全移除 select 所有箭頭 */
+  #divination-input select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: none;
   }
 }
 
@@ -2254,6 +2278,14 @@ footer::before {
   flex-grow: 1;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
+}
+
+/* 完全移除 select 元素的所有箭頭 */
+#divination-input select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: none;
 }
 
 #divination-input input:focus,
