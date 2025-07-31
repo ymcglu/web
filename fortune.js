@@ -264,6 +264,61 @@ document.addEventListener("DOMContentLoaded", function () {
     坤: "土",
   };
 
+  // 五行色彩和諧系統
+  const fiveElementsColors = {
+    木: {
+      primary: "#27ae60",
+      secondary: "#2ecc71",
+      harmony: "#3498db", // 水生木
+      contrast: "#e74c3c", // 火剋木
+      rgb: "39, 174, 96",
+    },
+    火: {
+      primary: "#e74c3c",
+      secondary: "#c0392b",
+      harmony: "#27ae60", // 木生火
+      contrast: "#3498db", // 水剋火
+      rgb: "231, 76, 60",
+    },
+    土: {
+      primary: "#f39c12",
+      secondary: "#e67e22",
+      harmony: "#e74c3c", // 火生土
+      contrast: "#27ae60", // 木剋土
+      rgb: "243, 156, 18",
+    },
+    金: {
+      primary: "#95a5a6",
+      secondary: "#7f8c8d",
+      harmony: "#f39c12", // 土生金
+      contrast: "#e74c3c", // 火剋金
+      rgb: "149, 165, 166",
+    },
+    水: {
+      primary: "#3498db",
+      secondary: "#2980b9",
+      harmony: "#95a5a6", // 金生水
+      contrast: "#f39c12", // 土剋水
+      rgb: "52, 152, 219",
+    },
+  };
+
+  // 陰陽對比原則應用
+  function applyYinYangHarmony(element, isYang = true) {
+    const elementColor = fiveElementsColors[element];
+    if (!elementColor) return null;
+
+    return {
+      primary: elementColor.primary,
+      secondary: isYang ? elementColor.secondary : elementColor.harmony,
+      accent: isYang ? elementColor.harmony : elementColor.contrast,
+      balance: `linear-gradient(45deg, ${elementColor.primary} 0%, ${elementColor.harmony} 100%)`,
+      yinYang: `radial-gradient(circle, ${
+        isYang ? elementColor.primary : elementColor.harmony
+      } 30%, ${isYang ? elementColor.harmony : elementColor.primary} 70%)`,
+    };
+  }
+
   // =========================================================================
   // 易經時間起卦系統
   // =========================================================================
@@ -520,13 +575,44 @@ document.addEventListener("DOMContentLoaded", function () {
     const dailyColor = guaColors[palaceGua];
     let themeColorHex = dailyColor.hex;
 
-    // 動態主題色彩切換邏輯，支援 RGB 變數
+    // 實施陰陽對比和五行色彩和諧原則
+    const hexagramElement = fiveElements[palaceGua];
+    const isYangHexagram = ["乾", "兌", "離", "震"].includes(palaceGua); // 陽卦判斷
+    const fiveElementHarmony = applyYinYangHarmony(
+      hexagramElement,
+      isYangHexagram
+    );
+
+    // 如果有五行和諧色彩，使用五行系統，否則使用原有色彩
+    if (fiveElementHarmony && hexagramElement) {
+      themeColorHex = fiveElementHarmony.primary;
+      // 動態主題色彩切換邏輯，支援 RGB 變數
+      const adjustedThemeColor = adjustColorForContrast(
+        themeColorHex,
+        "#121212",
+        4.5
+      );
+      const themeRgb = fiveElementsColors[hexagramElement].rgb;
+    } else {
+      // 動態主題色彩切換邏輯，支援 RGB 變數
+      const adjustedThemeColor = adjustColorForContrast(
+        themeColorHex,
+        "#121212",
+        4.5
+      );
+      const themeRgb = dailyColor.rgb;
+    }
+
+    // 重新定義變數以確保作用域正確
     const adjustedThemeColor = adjustColorForContrast(
       themeColorHex,
       "#121212",
       4.5
     );
-    const themeRgb = dailyColor.rgb;
+    const themeRgb =
+      fiveElementHarmony && hexagramElement
+        ? fiveElementsColors[hexagramElement].rgb
+        : dailyColor.rgb;
 
     // 設定主題色彩變數
     window.dailyThemeColor = adjustedThemeColor;
@@ -585,6 +671,42 @@ document.addEventListener("DOMContentLoaded", function () {
       "--theme-accent",
       `rgb(${accentRgb})`
     );
+
+    // 應用五行色彩和諧原則
+    if (fiveElementHarmony && hexagramElement) {
+      document.documentElement.style.setProperty(
+        "--five-element-primary",
+        fiveElementHarmony.primary
+      );
+      document.documentElement.style.setProperty(
+        "--five-element-secondary",
+        fiveElementHarmony.secondary
+      );
+      document.documentElement.style.setProperty(
+        "--five-element-accent",
+        fiveElementHarmony.accent
+      );
+      document.documentElement.style.setProperty(
+        "--five-element-balance",
+        fiveElementHarmony.balance
+      );
+      document.documentElement.style.setProperty(
+        "--yin-yang-harmony",
+        fiveElementHarmony.yinYang
+      );
+
+      // 更新玻璃質感以配合五行色彩
+      document.documentElement.style.setProperty(
+        "--glass-accent",
+        `rgba(${fiveElementsColors[hexagramElement].rgb}, 0.15)`
+      );
+
+      // 更新漸變以配合五行和諧
+      document.documentElement.style.setProperty(
+        "--accent-gradient",
+        fiveElementHarmony.balance
+      );
+    }
 
     const luckyColorName = dailyColor.name;
     const luckyColorHex = adjustedThemeColor;
