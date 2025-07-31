@@ -74,6 +74,104 @@ class LunarTimeChecker {
     }
   }
 
+  // 獲取祭祀適宜性分析
+  getSacrificeAnalysis() {
+    const yiJi = this.getYiJi();
+    const sacrificeKeywords = ['祭祀', '祈福', '拜神', '祭拜', '祠堂', '上香', '燒香', '敬神', '祈願', '祈禱'];
+    const tabooKeywords = ['破土', '動土', '安葬', '入殮', '移徙', '搬家'];
+    
+    // 檢查今日宜事中是否有祭祀相關
+    const suitableForSacrifice = yiJi.yi.some(item => 
+      sacrificeKeywords.some(keyword => item.includes(keyword))
+    );
+    
+    // 檢查今日忌事中是否有祭祀相關
+    const tabooForSacrifice = yiJi.ji.some(item => 
+      sacrificeKeywords.some(keyword => item.includes(keyword))
+    );
+    
+    // 檢查是否有其他不利祭祀的活動
+    const hasTabooActivities = yiJi.ji.some(item => 
+      tabooKeywords.some(keyword => item.includes(keyword))
+    );
+    
+    let status = 'neutral';
+    let recommendation = '';
+    let details = '';
+    
+    if (suitableForSacrifice) {
+      status = 'highly_suitable';
+      recommendation = '非常適合祭祀';
+      details = '今日宜祭祀祈福，是進行祭拜活動的良好時機。建議準備香燭供品，虔誠祭拜。';
+    } else if (tabooForSacrifice) {
+      status = 'not_suitable';
+      recommendation = '不宜祭祀';
+      details = '今日忌祭祀相關活動，建議擇日進行，以免衝撞神靈。';
+    } else if (hasTabooActivities) {
+      status = 'cautious';
+      recommendation = '謹慎祭祀';
+      details = '今日雖無明確祭祀禁忌，但有其他忌事，祭祀時需格外謹慎恭敬。';
+    } else {
+      status = 'suitable';
+      recommendation = '可以祭祀';
+      details = '今日平和安穩，適合進行一般性的祭祀祈福活動。';
+    }
+    
+    return {
+      status: status,
+      recommendation: recommendation,
+      details: details,
+      suitableActivities: yiJi.yi.filter(item => 
+        sacrificeKeywords.some(keyword => item.includes(keyword))
+      ),
+      tabooActivities: yiJi.ji.filter(item => 
+        sacrificeKeywords.some(keyword => item.includes(keyword))
+      )
+    };
+  }
+
+  // 獲取特定時辰的祭祀適宜性
+  getTimeSacrificeStatus(timeIndex) {
+    const dailySacrifice = this.getSacrificeAnalysis();
+    const targetTimeSlot = this.getTimeSlotFromIndex(timeIndex);
+    
+    // 祭祀的特殊時辰考慮
+    const auspiciousHours = [6, 7, 8, 9, 10, 11]; // 辰、巳、午時較適合
+    const inauspiciousHours = [23, 0, 1, 2, 3]; // 子、丑、寅時較不適合
+    
+    // 如果今日忌祭祀，所有時辰都不適合
+    if (dailySacrifice.status === 'not_suitable') {
+      return 'avoid_sacrifice';
+    }
+    
+    // 基於時辰判斷
+    if (auspiciousHours.includes(targetTimeSlot.start)) {
+      if (dailySacrifice.status === 'highly_suitable') return 'perfect_for_sacrifice';
+      return 'good_for_sacrifice';
+    }
+    
+    if (inauspiciousHours.includes(targetTimeSlot.start)) {
+      return 'avoid_sacrifice';
+    }
+    
+    // 其他時辰根據日期狀況判斷
+    if (dailySacrifice.status === 'highly_suitable') return 'good_for_sacrifice';
+    if (dailySacrifice.status === 'suitable') return 'neutral_sacrifice';
+    if (dailySacrifice.status === 'cautious') return 'cautious_sacrifice';
+    
+    return 'neutral_sacrifice';
+  }
+  
+  // 輔助函數：從時辰索引獲取時間段
+  getTimeSlotFromIndex(timeIndex) {
+    const timeSlots = [
+      {start: 23, end: 1}, {start: 1, end: 3}, {start: 3, end: 5}, {start: 5, end: 7},
+      {start: 7, end: 9}, {start: 9, end: 11}, {start: 11, end: 13}, {start: 13, end: 15},
+      {start: 15, end: 17}, {start: 17, end: 19}, {start: 19, end: 21}, {start: 21, end: 23}
+    ];
+    return timeSlots[timeIndex] || {start: 12, end: 14};
+  }
+
   // 獲取吉神方位
   getGodsDirection() {
     if (!this.lunar) {
@@ -124,87 +222,49 @@ class LunarTimeChecker {
     }
   }
 
-  // 獲取特定時辰的吉凶狀況
-  getTimeStatus(timeIndex) {
-    if (!this.lunar) {
-      return 'neutral';
-    }
 
-    try {
-      // 嘗試獲取時辰資訊
-      const lunarTimes = this.lunar.getTimes?.() || [];
-      
-      if (lunarTimes.length > timeIndex) {
-        const timeInfo = lunarTimes[timeIndex];
-        
-        // 根據時辰的吉凶情況判斷
-        if (timeInfo && typeof timeInfo === 'object') {
-          const ji = timeInfo.getJi?.() || [];
-          const yi = timeInfo.getYi?.() || [];
-          
-          if (yi.length > ji.length) {
-            return 'auspicious';
-          } else if (ji.length > yi.length) {
-            return 'inauspicious';
-          }
-        }
-      }
-      
-      // 基於簡單規律判斷（替代方案）
-      return this.getSimpleTimeStatus(timeIndex);
-    } catch (error) {
-      console.error(`獲取時辰 ${timeIndex} 狀況失敗:`, error);
-      return this.getSimpleTimeStatus(timeIndex);
-    }
-  }
-
-  // 簡單的時辰吉凶判斷（基於傳統規律）
-  getSimpleTimeStatus(timeIndex) {
-    // 基於傳統時辰吉凶的簡化規律
-    const currentHour = this.currentDate.getHours();
-    const dayOfYear = Math.floor((this.currentDate - new Date(this.currentDate.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
-    
-    // 簡單的偽隨機但穩定的吉凶判斷
-    const seed = (dayOfYear + timeIndex) % 7;
-    
-    if (seed < 2) {
-      return 'auspicious';
-    } else if (seed < 4) {
-      return 'neutral';
-    } else {
-      return 'inauspicious';
-    }
-  }
-
-  // 獲取時辰詳細資訊
+  // 獲取時辰詳細資訊 (只保留祭祀相關)
   getTimeDetails(timeIndex) {
     const timeName = this.timeNames[timeIndex];
     const timePeriod = this.timePeriods[timeIndex];
-    const status = this.getTimeStatus(timeIndex);
+    const sacrificeStatus = this.getTimeSacrificeStatus(timeIndex);
     
-    let description = '';
-    let advice = '';
+    let sacrificeAdvice = '';
+    let sacrificeDescription = '';
     
-    switch (status) {
-      case 'auspicious':
-        description = '此時辰氣運通暢，宜進行重要事務';
-        advice = '適合開會、談判、簽約、出行等重要活動';
+    // 祭祀專用建議和描述
+    switch (sacrificeStatus) {
+      case 'perfect_for_sacrifice':
+        sacrificeAdvice = '🏆 祭祀最佳時辰';
+        sacrificeDescription = '此時祭祀，諸神歡喜，祈願必應，是進行重要祭祀儀式的絕佳時機';
         break;
-      case 'inauspicious':
-        description = '此時辰需謹慎行事，宜靜不宜動';
-        advice = '建議休息調養、避免重大決策、延緩重要行動';
+      case 'good_for_sacrifice':
+        sacrificeAdvice = '✅ 適合祭祀祈福';
+        sacrificeDescription = '此時辰適宜祭祀，準備香燭供品，虔誠祭拜可得神靈庇佑';
+        break;
+      case 'cautious_sacrifice':
+        sacrificeAdvice = '⚠️ 謹慎祭祀';
+        sacrificeDescription = '可進行祭祀但需格外謹慎，保持恭敬虔誠之心，避免疏忽失禮';
+        break;
+      case 'neutral_sacrifice':
+        sacrificeAdvice = '🔘 一般祭祀時辰';
+        sacrificeDescription = '普通祭祀時辰，可進行日常祭拜、上香等簡單儀式';
+        break;
+      case 'avoid_sacrifice':
+        sacrificeAdvice = '❌ 不宜祭祀';
+        sacrificeDescription = '此時不宜進行祭祀活動，建議改選其他時辰以示敬意';
         break;
       default:
-        description = '此時辰運勢平穩，可照常行事';
-        advice = '適合日常工作、學習、處理一般事務';
+        sacrificeAdvice = '🔘 可進行一般祭祀';
+        sacrificeDescription = '可進行一般性的祭祀祈福活動';
     }
 
     return {
       name: timeName,
       period: timePeriod,
-      status: status,
-      description: description,
-      advice: advice
+      sacrificeStatus: sacrificeStatus,
+      sacrificeAdvice: sacrificeAdvice,
+      sacrificeDescription: sacrificeDescription
     };
   }
 
@@ -291,16 +351,17 @@ function updateData() {
     // 更新日期資訊
     updateDateInfo();
     
-    // 更新宜忌資訊
-    updateYiJi();
     
     // 更新吉神方位
     updateGodsDirection();
     
+    // 更新祭祀分析
+    updateSacrificeAnalysis();
+    
     // 更新時辰網格
     updateTimeGrid();
     
-    console.log('✅ 數據更新完成');
+    console.log('✅ 祭祀數據更新完成');
   } catch (error) {
     console.error('❌ 數據更新失敗:', error);
   }
@@ -319,26 +380,6 @@ function updateDateInfo() {
   }
 }
 
-// 更新今日宜忌
-function updateYiJi() {
-  const yiJi = lunarChecker.getYiJi();
-  
-  // 更新宜事
-  const yiElement = document.getElementById('yi-content');
-  if (yiElement) {
-    yiElement.innerHTML = yiJi.yi.map(item => 
-      `<span class="yi-ji-item yi-item">${item}</span>`
-    ).join('');
-  }
-  
-  // 更新忌事
-  const jiElement = document.getElementById('ji-content');
-  if (jiElement) {
-    jiElement.innerHTML = yiJi.ji.map(item => 
-      `<span class="yi-ji-item ji-item">${item}</span>`
-    ).join('');
-  }
-}
 
 // 更新吉神方位
 function updateGodsDirection() {
@@ -359,7 +400,54 @@ function updateGodsDirection() {
   }
 }
 
-// 更新時辰網格
+// 更新祭祀分析
+function updateSacrificeAnalysis() {
+  const sacrificeAnalysis = lunarChecker.getSacrificeAnalysis();
+  const sacrificeContent = document.getElementById('sacrifice-content');
+  
+  if (sacrificeContent) {
+    const statusIcons = {
+      'highly_suitable': '🏆',
+      'suitable': '✅',
+      'cautious': '⚠️',
+      'not_suitable': '❌',
+      'neutral': '🔘'
+    };
+
+    const icon = statusIcons[sacrificeAnalysis.status] || '🔘';
+    
+    let sacrificeItemsHtml = '';
+    if (sacrificeAnalysis.suitableActivities.length > 0) {
+      sacrificeItemsHtml += '<div class="sacrifice-info">';
+      sacrificeItemsHtml += sacrificeAnalysis.suitableActivities.map(item => 
+        `<span class="sacrifice-item">${item}</span>`
+      ).join('');
+      sacrificeItemsHtml += '</div>';
+    }
+    
+    if (sacrificeAnalysis.tabooActivities.length > 0) {
+      sacrificeItemsHtml += '<div class="sacrifice-info">';
+      sacrificeItemsHtml += '<strong style="color: var(--inauspicious-color); margin-right: 8px;">忌:</strong>';
+      sacrificeItemsHtml += sacrificeAnalysis.tabooActivities.map(item => 
+        `<span class="sacrifice-item" style="background: rgba(244,67,54,0.1); color: var(--inauspicious-color); border-color: var(--inauspicious-color);">${item}</span>`
+      ).join('');
+      sacrificeItemsHtml += '</div>';
+    }
+
+    sacrificeContent.innerHTML = `
+      <div class="sacrifice-status ${sacrificeAnalysis.status}">
+        <span class="sacrifice-status-icon">${icon}</span>
+        <span>${sacrificeAnalysis.recommendation}</span>
+      </div>
+      <div class="sacrifice-details">
+        ${sacrificeAnalysis.details}
+      </div>
+      ${sacrificeItemsHtml}
+    `;
+  }
+}
+
+// 更新時辰網格 (只顯示祭祀相關資訊)
 function updateTimeGrid() {
   const timesInfo = lunarChecker.getAllTimesInfo();
   const currentTimeIndex = lunarChecker.getCurrentTimeIndex();
@@ -368,23 +456,21 @@ function updateTimeGrid() {
   if (timeGrid) {
     timeGrid.innerHTML = timesInfo.map((timeInfo, index) => {
       const isCurrentTime = index === currentTimeIndex;
-      const statusClass = timeInfo.status;
-      const statusText = getStatusText(timeInfo.status);
+      const sacrificeStatusClass = getSacrificeStatusClass(timeInfo.sacrificeStatus);
       const currentClass = isCurrentTime ? ' current-time' : '';
       
       return `
-        <div class="time-card ${statusClass}${currentClass}">
+        <div class="time-card ${sacrificeStatusClass}${currentClass}">
           <div class="time-header">
             <div class="time-name">${timeInfo.name}時${isCurrentTime ? ' (現在)' : ''}</div>
             <div class="time-period">${timeInfo.period}</div>
           </div>
-          <div class="fortune-status">
-            <div class="status-indicator ${statusClass}"></div>
-            <div class="status-text">${statusText}</div>
+          <div class="sacrifice-status-display">
+            <div class="status-indicator ${sacrificeStatusClass}"></div>
+            <div class="status-text">${timeInfo.sacrificeAdvice}</div>
           </div>
           <div class="time-details">
-            <p><strong>運勢:</strong> ${timeInfo.description}</p>
-            <p><strong>建議:</strong> ${timeInfo.advice}</p>
+            <p><strong>祭祀指導:</strong> ${timeInfo.sacrificeDescription}</p>
           </div>
         </div>
       `;
@@ -392,15 +478,20 @@ function updateTimeGrid() {
   }
 }
 
-// 獲取狀態文字
-function getStatusText(status) {
-  switch (status) {
-    case 'auspicious':
-      return '吉時';
-    case 'inauspicious':
-      return '凶時';
+// 獲取祭祀狀態對應的CSS類名
+function getSacrificeStatusClass(sacrificeStatus) {
+  switch (sacrificeStatus) {
+    case 'perfect_for_sacrifice':
+      return 'perfect-sacrifice';
+    case 'good_for_sacrifice':
+      return 'good-sacrifice';
+    case 'cautious_sacrifice':
+      return 'cautious-sacrifice';
+    case 'avoid_sacrifice':
+      return 'avoid-sacrifice';
+    case 'neutral_sacrifice':
     default:
-      return '平時';
+      return 'neutral-sacrifice';
   }
 }
 
