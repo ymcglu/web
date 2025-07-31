@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>時辰吉凶查詢</title>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+    <script src="https://cdn.jsdelivr.net/npm/lunar-javascript@1.3.2/lunar.min.js"></script>
+    <style>
+      :root {
+        --bg-primary: #1a1a1b;
+        --bg-secondary: #272729;
+        --text-primary: #d7dadc;
+        --text-secondary: #818384;
+        --border-color: #343536;
+        --theme-color: #66bb6a;
+        --theme-color-rgb: 102, 187, 106;
+        --glass-accent: rgba(255, 255, 255, 0.05);
+        --text-on-theme: #ffffff;
+        --auspicious-color: #4caf50;
+        --inauspicious-color: #f44336;
+        --neutral-color: #ff9800;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Segoe UI', '微軟正黑體', 'Microsoft JhengHei', system-ui, sans-serif;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        padding: 20px;
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 30px;
+        padding: 20px;
+        background: rgba(var(--theme-color-rgb), 0.1);
+        border-radius: 15px;
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--glass-accent);
+      }
+
+      .header h1 {
+        font-size: 2.5rem;
+        background: linear-gradient(135deg, var(--theme-color), #81c784);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 10px;
+      }
+
+      .date-info {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+        margin-bottom: 20px;
+      }
+
+      .daily-summary {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+      }
+
+      .summary-card {
+        background: var(--bg-secondary);
+        border-radius: 15px;
+        padding: 20px;
+        border: 1px solid var(--border-color);
+        backdrop-filter: blur(10px);
+      }
+
+      .summary-card h3 {
+        color: var(--theme-color);
+        margin-bottom: 15px;
+        font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .summary-card .icon {
+        font-size: 1.5rem;
+      }
+
+      .yi-ji-content {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .yi-ji-item {
+        padding: 5px 10px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 500;
+      }
+
+      .yi-item {
+        background: rgba(76, 175, 80, 0.2);
+        color: var(--auspicious-color);
+        border: 1px solid var(--auspicious-color);
+      }
+
+      .ji-item {
+        background: rgba(244, 67, 54, 0.2);
+        color: var(--inauspicious-color);
+        border: 1px solid var(--inauspicious-color);
+      }
+
+      .time-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 15px;
+        margin-top: 20px;
+      }
+
+      .time-card {
+        background: var(--bg-secondary);
+        border-radius: 12px;
+        padding: 20px;
+        border: 1px solid var(--border-color);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .time-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--neutral-color);
+        transition: background 0.3s ease;
+      }
+
+      .time-card.auspicious::before {
+        background: var(--auspicious-color);
+      }
+
+      .time-card.inauspicious::before {
+        background: var(--inauspicious-color);
+      }
+
+      .time-card:hover {
+        transform: translateY(-2px);
+        border-color: var(--theme-color);
+        box-shadow: 0 8px 25px rgba(var(--theme-color-rgb), 0.2);
+      }
+
+      .time-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+
+      .time-name {
+        font-size: 1.3rem;
+        font-weight: bold;
+        color: var(--theme-color);
+      }
+
+      .time-period {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        background: var(--bg-primary);
+        padding: 5px 10px;
+        border-radius: 20px;
+      }
+
+      .fortune-status {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+
+      .status-indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--neutral-color);
+      }
+
+      .status-indicator.auspicious {
+        background: var(--auspicious-color);
+      }
+
+      .status-indicator.inauspicious {
+        background: var(--inauspicious-color);
+      }
+
+      .status-text {
+        font-weight: 500;
+        font-size: 1rem;
+      }
+
+      .time-details {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        line-height: 1.5;
+      }
+
+      .gods-info {
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid var(--border-color);
+      }
+
+      .gods-info h4 {
+        color: var(--theme-color);
+        margin-bottom: 10px;
+        font-size: 1rem;
+      }
+
+      .gods-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 10px;
+      }
+
+      .god-item {
+        text-align: center;
+        padding: 8px;
+        background: rgba(var(--theme-color-rgb), 0.1);
+        border-radius: 8px;
+        font-size: 0.85rem;
+      }
+
+      .god-name {
+        font-weight: bold;
+        color: var(--theme-color);
+        margin-bottom: 3px;
+      }
+
+      .god-direction {
+        color: var(--text-secondary);
+      }
+
+      .refresh-btn {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background: var(--theme-color);
+        color: var(--text-on-theme);
+        border: none;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+        cursor: pointer;
+        box-shadow: 0 4px 20px rgba(var(--theme-color-rgb), 0.4);
+        transition: all 0.3s ease;
+        z-index: 100;
+      }
+
+      .refresh-btn:hover {
+        transform: scale(1.1) rotate(180deg);
+        box-shadow: 0 6px 25px rgba(var(--theme-color-rgb), 0.6);
+      }
+
+      @media (max-width: 768px) {
+        body {
+          padding: 15px;
+        }
+
+        .header h1 {
+          font-size: 2rem;
+        }
+
+        .time-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .refresh-btn {
+          width: 50px;
+          height: 50px;
+          font-size: 1.2rem;
+          bottom: 20px;
+          right: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header class="header">
+        <h1>📅 時辰吉凶查詢</h1>
+        <div class="date-info" id="date-info"></div>
+      </header>
+
+      <div class="daily-summary">
+        <div class="summary-card">
+          <h3><span class="icon">✅</span>今日宜</h3>
+          <div class="yi-ji-content" id="yi-content"></div>
+        </div>
+        <div class="summary-card">
+          <h3><span class="icon">⛔</span>今日忌</h3>
+          <div class="yi-ji-content" id="ji-content"></div>
+        </div>
+      </div>
+
+      <div class="gods-info">
+        <h4>🎯 吉神方位</h4>
+        <div class="gods-grid" id="gods-grid"></div>
+      </div>
+
+      <div class="time-grid" id="time-grid"></div>
+    </div>
+
+    <button class="refresh-btn" onclick="updateData()" title="重新整理">
+      🔄
+    </button>
+
+    <script src="lunar_time.js"></script>
+  </body>
+</html>

@@ -60,6 +60,19 @@
                 美食推薦
               </a>
             </li>
+            <li role="presentation">
+              <a
+                href="#lunar-time-content"
+                class="nav-link"
+                data-target="lunar-time-content"
+                role="tab"
+                aria-selected="false"
+                aria-controls="lunar-time-content"
+                id="tab-lunar-time"
+              >
+                時辰吉凶
+              </a>
+            </li>
           </ul>
         </nav>
       </aside>
@@ -90,6 +103,22 @@
             src="eat/what_to_eat.html"
             class="content-iframe"
             title="美食推薦工具"
+            loading="lazy"
+          ></iframe>
+        </div>
+
+        <div
+          id="lunar-time-content"
+          class="content-section"
+          role="tabpanel"
+          aria-labelledby="tab-lunar-time"
+          tabindex="0"
+          aria-hidden="true"
+        >
+          <iframe
+            src="lunar-time/lunar_time.html"
+            class="content-iframe"
+            title="時辰吉凶查詢"
             loading="lazy"
           ></iframe>
         </div>
