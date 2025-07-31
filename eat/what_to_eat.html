@@ -50,8 +50,7 @@
         );
         color: #e0e0e0;
         box-sizing: border-box;
-        max-width: 1000px;
-        margin: 0 auto;
+        width: 100%;
         min-height: 100vh;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
@@ -90,7 +89,7 @@
         margin-top: 0;
         margin-bottom: 20px;
         font-size: 2em;
-        text-align: center;
+        text-align: left;
         background: var(--glass-bg);
         backdrop-filter: var(--glass-blur);
         -webkit-backdrop-filter: var(--glass-blur);
@@ -136,7 +135,7 @@
       p {
         font-size: 1.2em;
         line-height: 1.6;
-        text-align: center;
+        text-align: left;
         margin-bottom: 25px;
         background: var(--glass-bg);
         backdrop-filter: var(--glass-blur);
@@ -167,7 +166,7 @@
         display: flex;
         gap: 15px;
         align-items: center;
-        justify-content: center;
+        justify-content: flex-start;
         flex-wrap: wrap;
         background: var(--glass-bg);
         backdrop-filter: var(--glass-blur);
@@ -276,7 +275,7 @@
         font-size: 1.8em;
         color: #ffd700;
         min-height: 60px;
-        text-align: center;
+        text-align: left;
         font-weight: bold;
         padding: 20px;
         background: var(--glass-bg);
@@ -331,7 +330,7 @@
       #mapLink {
         margin: 20px 0;
         font-size: 1.2em;
-        text-align: center;
+        text-align: left;
         background: var(--glass-bg);
         backdrop-filter: var(--glass-blur);
         -webkit-backdrop-filter: var(--glass-blur);
@@ -392,7 +391,6 @@
       @media (max-width: 768px) {
         body {
           padding: 1rem;
-          max-width: 100%;
         }
 
         h1 {
@@ -537,7 +535,6 @@
       /* 大螢幕優化 */
       @media (min-width: 1200px) {
         body {
-          max-width: 1200px;
           padding: 3rem;
         }
 

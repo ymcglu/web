@@ -751,7 +751,7 @@ document.addEventListener("DOMContentLoaded", function () {
         divination;
       divinationDetails = `
             <div style="background: rgba(255,255,255,0.05); padding: 15px; margin: 15px 0; border-radius: 5px;">
-                <h4 style="margin-top: 0; color: ${luckyColorHex};">🎯 今日時間起卦詳情</h4>
+                <h4 style="margin-top: 0; color: ${luckyColorHex};">今日時間起卦詳情</h4>
                 <p><strong>起卦時間：</strong>農曆${lunarDate.lunarYear}年${lunarDate.lunarMonth}月${lunarDate.lunarDay}日 ${calculation.timeBranch}時</p>
                 <p><strong>卦象組成：</strong>上${upperGua}卦 + 下${lowerGua}卦 = <strong>第${hexagramNumber}卦 ${hexagram.name}卦</strong></p>
                 <p><strong>變爻位置：</strong>第${changingLineNum}爻</p>

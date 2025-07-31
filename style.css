@@ -1299,14 +1299,11 @@ header h1 {
 /* 美食推薦iframe在桌面版的寬度優化 */
 @media (min-width: 1024px) {
   #what-to-eat-content {
-    display: flex;
-    justify-content: center;
     width: 100%;
   }
 
   #what-to-eat-content .content-iframe {
     width: 100%;
-    max-width: 1200px;
   }
 }
 
@@ -1385,8 +1382,7 @@ footer::before {
 /* 響應式設計 - 大螢幕優化 */
 @media (min-width: 1400px) {
   .main-container {
-    max-width: 1400px;
-    margin: 0 auto;
+    width: 100%;
   }
 
   .content-area {
