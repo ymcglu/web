@@ -555,41 +555,6 @@ header h1 {
   letter-spacing: 0.1em;
 }
 
-/* 標題裝飾 - 傳統陰陽符號 */
-header h1::before {
-  content: "☯";
-  position: absolute;
-  left: -60px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 1.5rem;
-  color: var(--theme-color);
-  opacity: 0.6;
-  animation: yinYangRotate 20s linear infinite;
-}
-
-header h1::after {
-  content: "☯";
-  position: absolute;
-  right: -60px;
-  top: 50%;
-  transform: translateY(-50%) scaleX(-1);
-  font-size: 1.5rem;
-  color: var(--theme-color);
-  opacity: 0.6;
-  animation: yinYangRotate 20s linear infinite reverse;
-}
-
-/* 陰陽符號旋轉動畫 */
-@keyframes yinYangRotate {
-  0% {
-    transform: translateY(-50%) rotate(0deg);
-  }
-  100% {
-    transform: translateY(-50%) rotate(360deg);
-  }
-}
-
 /* 每日運勢 - 增強玻璃質感 */
 #daily-fortune {
   margin-top: 1.5rem;
@@ -689,29 +654,6 @@ header h1::after {
   font-family: "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC",
     "Source Han Sans SC", "Microsoft YaHei", "微軟雅黑", "SimHei", "黑體",
     sans-serif;
-}
-
-/* 標題裝飾 - 傳統菱形符號 */
-#daily-fortune h4::before {
-  content: "◆";
-  position: absolute;
-  left: -20px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--theme-color);
-  font-size: 0.8rem;
-  opacity: 0.7;
-}
-
-#daily-fortune h4::after {
-  content: "◆";
-  position: absolute;
-  right: -20px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--theme-color);
-  font-size: 0.8rem;
-  opacity: 0.7;
 }
 
 #daily-fortune p {
