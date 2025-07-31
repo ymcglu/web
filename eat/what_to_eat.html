@@ -234,12 +234,37 @@
         position: relative;
         z-index: 2;
         transition: all 0.3s var(--animation-smooth);
+        overflow: hidden;
+      }
+
+      /* 按鈕懸停光線掃過動畫 */
+      button::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent 0%,
+          rgba(255, 255, 255, 0.3) 50%,
+          transparent 100%
+        );
+        transition: left 0.6s ease;
+        z-index: 1;
+        border-radius: 8px;
+        pointer-events: none;
       }
 
       button:hover {
         transform: translateY(-2px);
         box-shadow: 0 8px 32px rgba(var(--theme-color-rgb), 0.6),
           inset 0 1px 0 rgba(255, 255, 255, 0.4);
+      }
+
+      button:hover::after {
+        left: 100%;
       }
 
       button:active {
@@ -485,6 +510,27 @@
 
         iframe {
           height: 200px;
+        }
+      }
+
+      /* 減少動畫偏好設定 */
+      @media (prefers-reduced-motion: reduce) {
+        button,
+        select,
+        #mapLink a {
+          transition: none;
+        }
+
+        button::after {
+          display: none;
+        }
+
+        button:hover {
+          transform: none;
+        }
+
+        #mapLink a:hover {
+          transform: none;
         }
       }
 
