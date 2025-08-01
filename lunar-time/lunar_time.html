@@ -5,8 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>祭祀時辰查詢</title>
     <link rel="preconnect" href="https://cdn.jsdelivr.net" />
-    <script src="https://cdn.jsdelivr.net/npm/lunar-javascript@1.3.2/lunar.min.js"></script>
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <!-- Replaced lunar-javascript with lunisolar library -->
+    <script src="https://cdn.jsdelivr.net/npm/lunisolar@latest/dist/index.umd.js"></script>
+    <meta
+      http-equiv="Cache-Control"
+      content="no-cache, no-store, must-revalidate"
+    />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     <style>
@@ -32,7 +36,8 @@
       }
 
       body {
-        font-family: 'Segoe UI', '微軟正黑體', 'Microsoft JhengHei', system-ui, sans-serif;
+        font-family: "Segoe UI", "微軟正黑體", "Microsoft JhengHei", system-ui,
+          sans-serif;
         background: var(--bg-primary);
         color: var(--text-primary);
         padding: 20px;
@@ -140,7 +145,7 @@
       }
 
       .time-card::before {
-        content: '';
+        content: "";
         position: absolute;
         top: 0;
         left: 0;
