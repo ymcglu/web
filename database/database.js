@@ -3768,6 +3768,6 @@ if (typeof module !== "undefined" && module.exports) {
 }
 
 // 如果直接通過 node 執行此文件，則運行檢查
-if (require.main === module) {
+if (typeof require !== "undefined" && require.main === module) {
   runChecks();
 }
