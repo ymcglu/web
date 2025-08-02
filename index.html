@@ -28,6 +28,9 @@
     <a href="#main-content" class="skip-link">跳到主要內容</a>
     <header>
       <h1>Daily Insights</h1>
+      <button id="themeToggle" class="theme-toggle" aria-label="切換主題模式">
+        <span class="theme-icon">🌙</span>
+      </button>
     </header>
 
     <div class="main-container">
@@ -141,5 +144,129 @@
 
     <!-- 效能監控和報告系統 -->
     <script src="performance-monitor.js"></script>
+    
+    <!-- 主題切換功能 -->
+    <script>
+      class ThemeManager {
+        constructor() {
+          this.themes = {
+            light: {
+              name: '淺色模式',
+              icon: '🌙',
+              vars: {
+                '--glass-bg': 'rgba(245, 241, 232, 0.8)',
+                '--glass-bg-fallback': 'rgba(245, 241, 232, 0.9)',
+                '--glass-border': 'rgba(93, 64, 55, 0.2)',
+                '--glass-border-bright': 'rgba(93, 64, 55, 0.3)',
+                '--glass-shadow': '0 8px 32px rgba(45, 24, 16, 0.15)',
+                '--glass-shadow-strong': '0 12px 40px rgba(45, 24, 16, 0.25)',
+                '--yin-color': '#faf7f0',
+                '--yang-color': '#3e2723',
+                '--text-on-theme': '#3e2723'
+              }
+            },
+            dark: {
+              name: '深色模式',
+              icon: '☀️',
+              vars: {
+                '--glass-bg': 'rgba(30, 30, 30, 0.7)',
+                '--glass-bg-fallback': 'rgba(30, 30, 30, 0.85)',
+                '--glass-border': 'rgba(255, 255, 255, 0.1)',
+                '--glass-border-bright': 'rgba(255, 255, 255, 0.15)',
+                '--glass-shadow': '0 8px 32px rgba(0, 0, 0, 0.3)',
+                '--glass-shadow-strong': '0 12px 40px rgba(0, 0, 0, 0.4)',
+                '--yin-color': '#2c3e50',
+                '--yang-color': '#ecf0f1',
+                '--text-on-theme': '#ffffff'
+              }
+            }
+          };
+          
+          this.currentTheme = localStorage.getItem('theme') || 'light';
+          this.init();
+        }
+        
+        init() {
+          this.applyTheme(this.currentTheme);
+          this.setupToggleButton();
+          this.setupIframeListeners();
+          this.notifyIframes();
+        }
+        
+        applyTheme(themeName) {
+          const theme = this.themes[themeName];
+          if (!theme) return;
+          
+          document.body.setAttribute('data-theme', themeName);
+          
+          const root = document.documentElement;
+          Object.entries(theme.vars).forEach(([property, value]) => {
+            root.style.setProperty(property, value);
+          });
+          
+          const icon = document.querySelector('.theme-icon');
+          if (icon) {
+            icon.textContent = theme.icon;
+          }
+          
+          this.currentTheme = themeName;
+          localStorage.setItem('theme', themeName);
+        }
+        
+        setupToggleButton() {
+          const button = document.getElementById('themeToggle');
+          if (button) {
+            button.addEventListener('click', () => {
+              const newTheme = this.currentTheme === 'light' ? 'dark' : 'light';
+              this.applyTheme(newTheme);
+              this.notifyIframes();
+            });
+          }
+        }
+        
+        notifyIframes() {
+          const iframes = document.querySelectorAll('.content-iframe');
+          iframes.forEach(iframe => {
+            if (iframe.contentWindow) {
+              try {
+                iframe.contentWindow.postMessage({
+                  type: 'THEME_CHANGE',
+                  theme: this.currentTheme
+                }, '*');
+              } catch (e) {
+                // iframe 可能還沒有完全載入，稍後重試
+                setTimeout(() => {
+                  try {
+                    iframe.contentWindow.postMessage({
+                      type: 'THEME_CHANGE',
+                      theme: this.currentTheme
+                    }, '*');
+                  } catch (e) {
+                    console.log('無法向 iframe 發送主題訊息:', e);
+                  }
+                }, 1000);
+              }
+            }
+          });
+        }
+        
+        // 監聽 iframe 載入完成事件
+        setupIframeListeners() {
+          const iframes = document.querySelectorAll('.content-iframe');
+          iframes.forEach(iframe => {
+            iframe.addEventListener('load', () => {
+              // iframe 載入完成後，發送當前主題
+              setTimeout(() => {
+                this.notifyIframes();
+              }, 100);
+            });
+          });
+        }
+      }
+      
+      document.addEventListener('DOMContentLoaded', () => {
+        window.themeManager = new ThemeManager();
+      });
+    </script>
   </body>
 </html>
