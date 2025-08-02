@@ -45,7 +45,7 @@
       .container {
         max-width: 1200px;
         margin: 0 auto;
-        min-height: 100vh;
+        height: 100vh;
         display: flex;
         flex-direction: column;
         padding: 20px;
@@ -53,7 +53,8 @@
 
       @media (max-width: 768px) {
         .container {
-          min-height: calc(100vh - 20px);
+          height: 100vh;
+          padding: 8px;
         }
       }
 
@@ -65,6 +66,9 @@
         border: 1px solid rgba(255, 255, 255, 0.05);
         flex-shrink: 0;
         margin-bottom: 20px;
+        position: sticky;
+        top: 0;
+        z-index: 10;
       }
 
       .header h1 {
@@ -343,6 +347,7 @@
 
       @media (max-width: 768px) {
         .container {
+          height: 100vh;
           padding: 8px;
         }
 
@@ -425,6 +430,7 @@
       /* 更小手機螢幕優化 */
       @media (max-width: 480px) {
         .container {
+          height: 100vh;
           padding: 6px;
         }
 
@@ -550,7 +556,7 @@
 
       <div
         id="content"
-        style="display: none; flex: 1; overflow-y: auto; padding-right: 10px"
+        style="display: none; flex: 1; overflow-y: auto; padding-right: 10px; min-height: 0;"
         <!--
         所有時辰概覽
         --
