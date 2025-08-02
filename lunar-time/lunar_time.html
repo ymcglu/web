@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>農曆時辰宜忌查詢</title>
+    <title>補充能量好時機</title>
     <style>
       :root {
         --bg-primary: #1a1a1b;
@@ -30,27 +30,34 @@
           sans-serif;
         background: var(--bg-primary);
         color: var(--text-primary);
-        padding: 20px;
-        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        overflow: hidden;
       }
 
       .container {
         max-width: 1200px;
         margin: 0 auto;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
       }
 
       .header {
         text-align: center;
-        margin-bottom: 30px;
         padding: 20px;
         background: rgba(var(--theme-color-rgb), 0.1);
         border-radius: 15px;
         border: 1px solid rgba(255, 255, 255, 0.05);
+        flex-shrink: 0;
+        margin-bottom: 20px;
       }
 
       .header h1 {
         font-size: 2.5rem;
-        background: linear-gradient(135deg, var(--theme-color), #8a9481);
+        background: linear-gradient(135deg, #f9c74f, #f8961e);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
@@ -96,6 +103,35 @@
         box-shadow: 0 0 0 2px rgba(var(--theme-color-rgb), 0.2);
       }
 
+      /* 日期選擇器樣式 */
+      .date-input {
+        color-scheme: dark;
+        position: relative;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2'%3e%3crect x='3' y='4' width='18' height='18' rx='2' ry='2'/%3e%3cline x1='16' y1='2' x2='16' y2='6'/%3e%3cline x1='8' y1='2' x2='8' y2='6'/%3e%3cline x1='3' y1='10' x2='21' y2='10'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        background-size: 18px;
+        padding-right: 40px;
+      }
+
+      .date-input::-webkit-calendar-picker-indicator {
+        opacity: 0;
+        cursor: pointer;
+        width: 20px;
+        height: 20px;
+        position: absolute;
+        right: 10px;
+      }
+
+      /* 確保日期選擇器彈出面板使用深色主題 */
+      .date-input::-webkit-datetime-edit {
+        color: var(--text-primary);
+      }
+
+      .date-input::-webkit-datetime-edit-fields-wrapper {
+        color: var(--text-primary);
+      }
+
       .query-btn {
         background: var(--theme-color);
         color: white;
@@ -117,24 +153,6 @@
         font-size: 1.1rem;
         color: var(--text-secondary);
         margin-top: 15px;
-      }
-
-      .selected-time-info {
-        background: var(--bg-secondary);
-        border-radius: 15px;
-        padding: 20px;
-        margin-bottom: 30px;
-        border: 2px solid var(--selected-color);
-        box-shadow: 0 0 20px rgba(107, 141, 181, 0.2);
-      }
-
-      .selected-time-info h3 {
-        color: var(--selected-color);
-        margin-bottom: 15px;
-        font-size: 1.3rem;
-        display: flex;
-        align-items: center;
-        gap: 10px;
       }
 
       .time-details {
@@ -210,8 +228,8 @@
       }
 
       .all-times-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        display: flex;
+        flex-direction: column;
         gap: 15px;
       }
 
@@ -334,12 +352,31 @@
           font-size: 2rem;
         }
       }
+
+      /* 自定義滾動條樣式 */
+      #content::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      #content::-webkit-scrollbar-track {
+        background: var(--bg-secondary);
+        border-radius: 4px;
+      }
+
+      #content::-webkit-scrollbar-thumb {
+        background: var(--theme-color);
+        border-radius: 4px;
+      }
+
+      #content::-webkit-scrollbar-thumb:hover {
+        background: #8a9481;
+      }
     </style>
   </head>
   <body>
     <div class="container">
       <header class="header">
-        <h1>農曆時辰宜忌查詢</h1>
+        <h1>補充能量好時機</h1>
         <div class="controls">
           <div class="input-group">
             <label for="date-input">選擇日期</label>
@@ -380,14 +417,13 @@
 
       <div id="error" class="error" style="display: none"></div>
 
-      <div id="content" style="display: none">
-        <!-- 選定時辰詳細信息 -->
-        <div class="selected-time-info" id="selected-time-info">
-          <h3>選定時辰詳情</h3>
-          <div id="selected-time-content"></div>
-        </div>
-
-        <!-- 所有時辰概覽 -->
+      <div
+        id="content"
+        style="display: none; flex: 1; overflow-y: auto; padding-right: 10px"
+        <!--
+        所有時辰概覽
+        --
+      >
         <div class="all-times-grid" id="all-times-grid"></div>
       </div>
     </div>
@@ -520,10 +556,22 @@
 
           // 更新頁面內容
           updateDateInfo(solar, currentLunarDay);
-          updateSelectedTimeInfo();
           updateAllTimesGrid();
 
           showContent();
+
+          // 滾動到選定的時辰卡片
+          setTimeout(() => {
+            const selectedCard = document.getElementById(
+              `time-card-${selectedTimeIndex}`
+            );
+            if (selectedCard) {
+              selectedCard.scrollIntoView({
+                behavior: "smooth",
+                block: "center",
+              });
+            }
+          }, 100);
         } catch (error) {
           console.error("查詢失敗:", error);
           showError("查詢農曆資料失敗：" + error.message);
@@ -534,13 +582,78 @@
       function updateDateInfo(solar, lunar) {
         const dateInfo = document.getElementById("date-info");
         const solarStr = `${solar.getYear()}年${solar.getMonth()}月${solar.getDay()}日`;
-        const lunarStr = `${lunar.getYear()}年${lunar.getMonth()}月${lunar.getDay()}日`;
         const weekday = solar.getWeek().getName();
 
+        // 格式化農曆日期
+        const lunarMonth = lunar.getLunarMonth();
+        const lunarDay = lunar.getDay();
+
+        // 將農曆日期轉換為傳統格式
+        const lunarMonthStr = formatLunarMonth(lunarMonth);
+        const lunarDayStr = formatLunarDay(lunarDay);
+        const lunarStr = `農曆${lunarMonthStr}${lunarDayStr}`;
+
+        console.log("星期:", weekday); // 調試用
+
         dateInfo.innerHTML = `
-                <div><strong>公曆:</strong> ${solarStr} (${weekday})</div>
-                <div><strong>農曆:</strong> ${lunarStr}</div>
+                <div style="font-size: 1.1rem; line-height: 1.6; color: #b0b3b8;">
+                    ${solarStr} ${lunarStr} 星期${weekday}
+                </div>
             `;
+      }
+
+      // 格式化農曆月份
+      function formatLunarMonth(lunarMonth) {
+        // 檢查是否為閏月
+        const isLeap = lunarMonth.isLeap && lunarMonth.isLeap();
+        const monthNum = lunarMonth.getMonth();
+
+        const monthNames = [
+          "",
+          "正月",
+          "二月",
+          "三月",
+          "四月",
+          "五月",
+          "六月",
+          "七月",
+          "八月",
+          "九月",
+          "十月",
+          "十一月",
+          "十二月",
+        ];
+
+        const monthName = monthNames[monthNum] || `${monthNum}月`;
+        return isLeap ? `閏${monthName}` : monthName;
+      }
+
+      // 格式化農曆日期
+      function formatLunarDay(day) {
+        const dayNum = parseInt(day);
+        if (dayNum <= 10) {
+          return `初${
+            ["", "一", "二", "三", "四", "五", "六", "七", "八", "九", "十"][
+              dayNum
+            ]
+          }`;
+        } else if (dayNum < 20) {
+          return `十${
+            ["", "一", "二", "三", "四", "五", "六", "七", "八", "九"][
+              dayNum - 10
+            ]
+          }`;
+        } else if (dayNum === 20) {
+          return "二十";
+        } else if (dayNum < 30) {
+          return `廿${
+            ["", "一", "二", "三", "四", "五", "六", "七", "八", "九"][
+              dayNum - 20
+            ]
+          }`;
+        } else {
+          return `三十${dayNum > 30 ? ["", "一"][dayNum - 30] : ""}`;
+        }
       }
 
       // 更新選定時辰信息
@@ -648,6 +761,13 @@
         if (!currentLunarDay) return;
 
         const allTimesGrid = document.getElementById("all-times-grid");
+
+        // 檢查是否查詢今天
+        const dateInput = document.getElementById("date-input");
+        const selectedDate = new Date(dateInput.value);
+        const today = new Date();
+        const isToday = selectedDate.toDateString() === today.toDateString();
+
         const currentHour = new Date().getHours();
         const currentTimeIndex = getCurrentTimeIndex(currentHour);
 
@@ -667,7 +787,8 @@
               cardClasses += " selected";
             }
 
-            if (i === currentTimeIndex) {
+            // 只有在查詢今天時才標示當前時辰
+            if (isToday && i === currentTimeIndex) {
               cardClasses += " current";
             }
 
@@ -703,14 +824,60 @@
               }
 
               sacrificeStatusHtml = `
-                            <div class="time-sacrifice-status ${sacrificeStatus.class}">
+                            <div class="time-sacrifice-status ${
+                              sacrificeStatus.class
+                            }">
                                 ${sacrificeStatus.icon} ${sacrificeStatus.text}
+                            </div>
+                            <div class="time-details">
+                                <div class="yi-ji-section">
+                                    <h5 style="color: var(--auspicious-color); margin-bottom: 5px; font-size: 0.9rem;">✅ 宜</h5>
+                                    <div class="yi-ji-items" style="margin-bottom: 10px;">
+                                        ${
+                                          recommends.length > 0
+                                            ? recommends
+                                                .map((item) => {
+                                                  const isSacrifice =
+                                                    item.includes("祭祀") ||
+                                                    item.includes("祈福");
+                                                  const highlightStyle =
+                                                    isSacrifice
+                                                      ? "color: #8bc34a; background: rgba(139, 195, 74, 0.2);"
+                                                      : "";
+                                                  return `<span class="yi-item" style="font-size: 0.8rem; padding: 2px 6px; ${highlightStyle}">${item}</span>`;
+                                                })
+                                                .join("")
+                                            : '<span style="color: var(--text-secondary); font-size: 0.8rem;">無特別宜事</span>'
+                                        }
+                                    </div>
+                                </div>
+                                <div class="yi-ji-section">
+                                    <h5 style="color: var(--inauspicious-color); margin-bottom: 5px; font-size: 0.9rem;">❌ 忌</h5>
+                                    <div class="yi-ji-items">
+                                        ${
+                                          avoids.length > 0
+                                            ? avoids
+                                                .map((item) => {
+                                                  const isSacrifice =
+                                                    item.includes("祭祀") ||
+                                                    item.includes("祈福");
+                                                  const highlightStyle =
+                                                    isSacrifice
+                                                      ? "color: #ef5350; background: rgba(239, 83, 80, 0.2);"
+                                                      : "";
+                                                  return `<span class="ji-item" style="font-size: 0.8rem; padding: 2px 6px; ${highlightStyle}">${item}</span>`;
+                                                })
+                                                .join("")
+                                            : '<span style="color: var(--text-secondary); font-size: 0.8rem;">無特別忌事</span>'
+                                        }
+                                    </div>
+                                </div>
                             </div>
                         `;
             }
 
             gridHtml += `
-                        <div class="${cardClasses}" onclick="selectTime(${i})">
+                        <div id="time-card-${i}" class="${cardClasses}" onclick="selectTime(${i})">
                             <div class="time-card-header">
                                 <div class="time-name">${timeLabel}</div>
                                 <div class="time-period">${timePeriod}</div>
@@ -781,7 +948,6 @@
         const timeSelect = document.getElementById("time-select");
         timeSelect.value = timeIndex;
 
-        updateSelectedTimeInfo();
         updateAllTimesGrid();
       }
 
