@@ -66,28 +66,26 @@ document.addEventListener("DOMContentLoaded", function () {
     const allLines = [...lowerLines, ...upperLines];
 
     // 數字轉中文
-    const numberToChinese = (num) => {
-      const chineseNumbers = ["", "一", "二", "三", "四", "五", "六"];
-      return chineseNumbers[num] || num.toString();
-    };
+    const chineseNumbers = ["一", "二", "三", "四", "五", "六"];
 
-    // 標記變爻 (changingLine 是0-5的索引)
-    let visualLines = allLines.map((line, index) => {
-      const isChanging = index === changingLine;
-      const lineNumber = index + 1;
+    // 標記變爻 (changingLine 是0-5的索引)，從上到下排列
+    let hexagramRows = [];
+    for (let i = 5; i >= 0; i--) {
+      const isChanging = i === changingLine;
       const prefix = isChanging ? "●" : "○";
-      const spacing = line === "—" ? "━━━" : "━ ━"; // 使用更粗的線條
-      return `${prefix} ${spacing}`;
-    });
-
-    // 反轉順序，因為易經是從上到下讀的
-    visualLines.reverse();
+      const spacing = allLines[i] === "—" ? "━━━" : "━ ━";
+      const lineNumber = chineseNumbers[i];
+      
+      hexagramRows.push({
+        symbol: `${prefix} ${spacing}`,
+        number: lineNumber
+      });
+    }
 
     return {
-      lines: visualLines,
+      rows: hexagramRows,
       upperGua: upperGuaName,
       lowerGua: lowerGuaName,
-      ascii: visualLines.join("\n"),
     };
   }
 
@@ -491,7 +489,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         return {
           description: data.data?.horoscope_data || "星象能量今日特別活躍",
-          source: `Horoscope App API (via ${corsProxies[i].split("/")[2]})`,
+          source: "星象智慧",
           success: true,
         };
       } catch (error) {
@@ -737,12 +735,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const isApiFallback =
       astroData &&
       (astroData.source === "fallback" || astroData.source === "AI智能預測");
-    const apiStatus =
-      astroData && astroData.success === false
-        ? "AI智能預測"
-        : astroData && astroData.source
-        ? `${astroData.source}`
-        : "宇宙智慧";
 
     // 生成起卦詳情
     let divinationDetails = "";
@@ -750,68 +742,130 @@ document.addEventListener("DOMContentLoaded", function () {
       const { lunarDate, upperGua, lowerGua, changingLineNum, calculation } =
         divination;
       divinationDetails = `
-            <div style="background: rgba(255,255,255,0.05); padding: 15px; margin: 15px 0; border-radius: 5px;">
-                <h4 style="margin-top: 0; color: ${luckyColorHex};">今日時間起卦詳情</h4>
-                <p><strong>起卦時間：</strong>農曆${lunarDate.lunarYear}年${lunarDate.lunarMonth}月${lunarDate.lunarDay}日 ${calculation.timeBranch}時</p>
-                <p><strong>卦象組成：</strong>上${upperGua}卦 + 下${lowerGua}卦 = <strong>第${hexagramNumber}卦 ${hexagram.name}卦</strong></p>
-                <p><strong>變爻位置：</strong>第${changingLineNum}爻</p>
-                <p style="font-size: 0.9em; color: #888; margin-bottom: 0;">※ 按照傳統梅花易數時間起卦法，以打開網頁的時間為準</p>
+            <div class="divination-card">
+                <div class="divination-header">
+                    <h5>即時起卦</h5>
+                </div>
+                <div class="divination-content">
+                    <div class="divination-row">
+                        <div class="divination-label">起卦時間</div>
+                        <div class="divination-value">農曆${lunarDate.lunarYear}年${lunarDate.lunarMonth}月${lunarDate.lunarDay}日 ${calculation.timeBranch}時</div>
+                    </div>
+                    <div class="divination-row">
+                        <div class="divination-label">卦象組成</div>
+                        <div class="divination-value">上${upperGua}卦 + 下${lowerGua}卦 = <strong>第${hexagramNumber}卦 ${hexagram.name}卦</strong></div>
+                    </div>
+                    <div class="divination-row">
+                        <div class="divination-label">變爻位置</div>
+                        <div class="divination-value">第${changingLineNum}爻</div>
+                    </div>
+                </div>
+                <div class="divination-footer">
+                    <span class="divination-note">※ 按照傳統梅花易數時間起卦法，以打開網頁的時間為準</span>
+                </div>
             </div>`;
     } else {
       divinationDetails = `
-            <div style="background: rgba(255,255,255,0.05); padding: 15px; margin: 15px 0; border-radius: 5px;">
-                <p style="color: #888; margin: 0; font-size: 0.9em;">※ 今日使用隨機起卦方式，如需時間起卦請重新整理頁面</p>
+            <div class="divination-card divination-card--fallback">
+                <div class="divination-header">
+                    <h5>即時起卦</h5>
+                </div>
+                <div class="divination-content">
+                    <div class="divination-note">※ 今日使用隨機起卦方式，如需時間起卦請重新整理頁面</div>
+                </div>
             </div>`;
     }
 
     return `
             <p style="text-align: center; color: #a0a0a0; border-bottom: 1px solid #333; padding-bottom: 15px;">
                 <strong>幸運色:</strong> <span style="background-color: ${luckyColorHex}; color: ${textColor}; padding: 3px 10px; border-radius: 5px; font-weight: bold;">${luckyColorName}</span> | 
-                <strong>今日卦象:</strong> ${hexagram.name} | 
-                <span style="color: #888; font-size: 0.9em;">${apiStatus}</span>
+                <strong>今日卦象:</strong> ${hexagram.name}
             </p>
-
-            ${divinationDetails}
 
             <h4><strong>策略：易經的智慧箴言</strong></h4>
             <p>針對今日的能量主題，易經為您指引的策略核心，來自 <strong>${
               hexagram.name
             }卦</strong> 的第 <strong>${changingLine + 1}</strong> 爻，其爻辭為：</p>
             
-            <div class="yao-ci-container">
-                <div class="yao-ci-image">
-                    <div class="hexagram-ascii">
-                        ${generateHexagramVisual(
-                          hexagram.name,
-                          changingLine
-                        ).lines.join("\n")}
-                        <div class="yao-numbers">六\n五\n四\n三\n二\n一</div>
+            <div class="strategy-grid">
+                <div class="divination-details-card">
+                    ${divinationDetails}
+                </div>
+                
+                <div class="hexagram-card">
+                    <div class="hexagram-card-header">
+                        <h5>六爻卦象</h5>
+                    </div>
+                    <div class="hexagram-card-body">
+                        <div class="hexagram-display">
+                            ${generateHexagramVisual(
+                              hexagram.name,
+                              changingLine
+                            ).rows.map(row => 
+                              `<div class="hexagram-row">
+                                 <div class="yao-symbol">${row.symbol}</div>
+                                 <div class="yao-number">${row.number}</div>
+                               </div>`
+                            ).join('')}
+                        </div>
                     </div>
                 </div>
-                <div class="yao-ci-content">
-                    <p class="yao-ci">「${yaoCi}」</p>
-                    ${
-                      yaoCiImage
-                        ? `<p style="font-style: italic; color: #a0a0a0; margin: 5px 0; font-size: 0.9em;"><strong>《象》曰：</strong>${yaoCiImage}</p>`
-                        : ""
-                    }
-                    <p style="font-style: italic; color: #c0c0c0; margin: 0;"><strong>爻辭淺釋：</strong>${yaoCiExplanation}</p>
+                
+                <div class="yao-ci-card">
+                    <div class="yao-ci-header">
+                        <h5>爻辭箴言</h5>
+                    </div>
+                    <div class="yao-ci-body">
+                        <p class="yao-ci">「${yaoCi}」</p>
+                        ${
+                          yaoCiImage
+                            ? `<p class="yao-ci-image-text"><strong>《象》曰：</strong>${yaoCiImage}</p>`
+                            : ""
+                        }
+                    </div>
+                </div>
+                
+                <div class="yao-ci-explanation-card">
+                    <div class="yao-ci-explanation-header">
+                        <h5>爻辭淺釋</h5>
+                    </div>
+                    <div class="yao-ci-explanation-body">
+                        <p>${yaoCiExplanation}</p>
+                    </div>
                 </div>
             </div>
 
-            <h4><strong>綜合建議：今日的行動方案</strong></h4>
-            <div style="line-height: 1.6; white-space: pre-line;">${interpret(
-              astroTheme,
-              zwdsProfile,
-              hexagram.name,
-              yaoCi
-            )}</div>
+            <div class="fortune-card fortune-card--advice">
+                <div class="fortune-header">
+                    <h4>綜合建議：今日的行動方案</h4>
+                </div>
+                <div class="fortune-content">
+                    <div style="line-height: 1.6; white-space: pre-line;">${interpret(
+                      astroTheme,
+                      zwdsProfile,
+                      hexagram.name,
+                      yaoCi
+                    )}</div>
+                </div>
+            </div>
 
-            <h4><strong>今日主題：星象的啟示</strong></h4>
-            <p>${astroTheme}</p>
+            <div class="fortune-card fortune-card--theme">
+                <div class="fortune-header">
+                    <h4>今日主題：星象的啟示</h4>
+                </div>
+                <div class="fortune-content">
+                    <p>${astroTheme}</p>
+                </div>
+            </div>
 
-            <h4><strong>根基：您的紫微斗數命盤特質</strong></h4>
-            <p>${zwdsProfile.analysis}</p>
+            <div class="fortune-card fortune-card--foundation">
+                <div class="fortune-header">
+                    <h4>根基：您的紫微斗數命盤特質</h4>
+                </div>
+                <div class="fortune-content">
+                    <p>${zwdsProfile.analysis}</p>
+                </div>
+            </div>
         `;
   }
 

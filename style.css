@@ -846,7 +846,7 @@ header h1 {
   top: 12px;
   font-size: 10px;
   color: rgba(255, 215, 0, 0.6);
-  line-height: 22.4px;
+  line-height: 1.4em;
   white-space: pre;
   text-align: center;
   width: 12px;
@@ -856,6 +856,10 @@ header h1 {
   text-shadow: 0 0 4px rgba(255, 215, 0, 0.8);
   pointer-events: none;
   transition: color 0.3s ease, text-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: calc(100% - 24px);
 }
 
 .hexagram-ascii:hover .yao-numbers {
@@ -911,6 +915,13 @@ header h1 {
     text-shadow: 0 0 6px rgba(255, 215, 0, 0.7), 0 0 12px rgba(255, 215, 0, 0.5);
   }
 
+  .hexagram-ascii .yao-numbers {
+    font-size: 9px;
+    right: 3px;
+    top: 10px;
+    height: calc(100% - 20px);
+  }
+
   .hexagram-ascii:hover {
     transform: translateY(-1px) rotateX(3deg);
     box-shadow: 0 0 20px rgba(255, 215, 0, 0.4),
@@ -951,6 +962,13 @@ header h1 {
     text-shadow: 0 0 4px rgba(255, 215, 0, 0.6), 0 0 8px rgba(255, 215, 0, 0.4);
   }
 
+  .hexagram-ascii .yao-numbers {
+    font-size: 8px;
+    right: 2px;
+    top: 8px;
+    height: calc(100% - 16px);
+  }
+
   .hexagram-ascii:hover {
     transform: translateY(-0.5px);
     box-shadow: 0 0 15px rgba(255, 215, 0, 0.3), 0 0 30px rgba(255, 215, 0, 0.2),
@@ -988,6 +1006,13 @@ header h1 {
     box-shadow: 0 0 10px rgba(255, 215, 0, 0.15),
       0 0 20px rgba(255, 215, 0, 0.08), 0 2px 10px rgba(255, 215, 0, 0.2);
     text-shadow: 0 0 3px rgba(255, 215, 0, 0.5), 0 0 6px rgba(255, 215, 0, 0.3);
+  }
+
+  .hexagram-ascii .yao-numbers {
+    font-size: 7px;
+    right: 1px;
+    top: 6px;
+    height: calc(100% - 12px);
   }
 
   .hexagram-ascii:hover {
@@ -1413,6 +1438,13 @@ footer::before {
       inset 0 -2px 0 rgba(255, 215, 0, 0.15);
     text-shadow: 0 0 10px rgba(255, 215, 0, 0.9),
       0 0 20px rgba(255, 215, 0, 0.7), 0 0 30px rgba(255, 215, 0, 0.5);
+  }
+
+  .hexagram-ascii .yao-numbers {
+    font-size: 11px;
+    right: 5px;
+    top: 14px;
+    height: calc(100% - 28px);
   }
 
   .hexagram-ascii:hover {
@@ -2212,6 +2244,645 @@ footer::before {
 
   #divination-input button:active {
     transform: none !important;
+  }
+}
+
+/* 新的六爻卦象顯示樣式 */
+.hexagram-display {
+  /* 中文字體優化，確保易經符號最佳顯示 */
+  font-family: "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC",
+    "Source Han Sans SC", "Microsoft YaHei", "微軟雅黑", "SimHei", "黑體",
+    "Courier New", "Monaco", "Menlo", "Consolas", monospace;
+  font-size: 16px;
+  color: #ffd700;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 10px;
+  /* 五行色彩和諧邊框 */
+  border: 2px solid;
+  border-image: linear-gradient(
+      45deg,
+      rgba(255, 215, 0, 0.7) 0%,
+      rgba(255, 215, 0, 0.5) 25%,
+      rgba(255, 215, 0, 0.7) 50%,
+      rgba(255, 215, 0, 0.5) 75%,
+      rgba(255, 215, 0, 0.7) 100%
+    )
+    1;
+  font-weight: 500;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.3), 0 0 40px rgba(255, 215, 0, 0.2),
+    0 6px 20px rgba(255, 215, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    inset 0 -1px 0 rgba(255, 215, 0, 0.1);
+  min-width: 160px;
+  width: 160px;
+  height: auto;
+  padding: 12px;
+  position: relative;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.8), 0 0 16px rgba(255, 215, 0, 0.6),
+    0 0 24px rgba(255, 215, 0, 0.4);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+/* 六爻行容器 */
+.hexagram-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2px;
+  padding: 1px 0;
+}
+
+/* 爻符號區域 */
+.yao-symbol {
+  flex: 1;
+  text-align: center;
+  letter-spacing: 0px;
+  word-spacing: 0;
+}
+
+/* 爻數字區域 */
+.yao-number {
+  width: 20px;
+  text-align: center;
+  font-size: 10px;
+  color: rgba(255, 215, 0, 0.6);
+  margin-left: 8px;
+}
+
+/* 懸停效果 */
+.hexagram-display:hover {
+  transform: translateY(-2px) rotateX(5deg) rotateY(2deg);
+  box-shadow: 0 0 30px rgba(255, 215, 0, 0.5), 0 0 60px rgba(255, 215, 0, 0.3),
+    0 8px 25px rgba(255, 215, 0, 0.6), inset 0 2px 0 rgba(255, 255, 255, 0.25),
+    inset 0 -2px 0 rgba(255, 215, 0, 0.2);
+  text-shadow: 0 0 12px rgba(255, 215, 0, 1), 0 0 24px rgba(255, 215, 0, 0.8),
+    0 0 36px rgba(255, 215, 0, 0.6);
+}
+
+.hexagram-display:hover .yao-number {
+  color: rgba(255, 215, 0, 0.8);
+  text-shadow: 0 0 6px rgba(255, 215, 0, 1);
+}
+
+/* 響應式優化 */
+@media (max-width: 768px) {
+  .hexagram-display {
+    font-size: 15px;
+    padding: 12px;
+    min-width: 140px;
+    width: 140px;
+  }
+  
+  .yao-number {
+    font-size: 9px;
+    width: 18px;
+  }
+  
+  .hexagram-display:hover {
+    transform: translateY(-1px) rotateX(3deg);
+  }
+}
+
+@media (max-width: 480px) {
+  .hexagram-display {
+    font-size: 13px;
+    padding: 10px;
+    min-width: 120px;
+    width: 120px;
+  }
+  
+  .yao-number {
+    font-size: 8px;
+    width: 16px;
+  }
+}
+
+@media (max-width: 360px) {
+  .hexagram-display {
+    font-size: 12px;
+    padding: 8px;
+    min-width: 100px;
+    width: 100px;
+  }
+  
+  .yao-number {
+    font-size: 7px;
+    width: 14px;
+  }
+  
+  .hexagram-display:hover {
+    transform: none;
+  }
+}
+
+/* 起卦詳情卡片樣式 */
+.divination-card {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  margin: 20px 0;
+  overflow: hidden;
+  box-shadow: var(--glass-shadow);
+  transition: all 0.3s ease;
+}
+
+.divination-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 20px rgba(var(--theme-color-rgb), 0.1);
+}
+
+.divination-header {
+  background: linear-gradient(135deg, 
+    rgba(var(--theme-color-rgb), 0.15) 0%, 
+    rgba(var(--theme-color-rgb), 0.05) 100%);
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(var(--theme-color-rgb), 0.1);
+}
+
+.divination-header h4,
+.divination-header h5 {
+  margin: 0;
+  color: var(--theme-color);
+  font-size: 1em;
+  font-weight: 600;
+}
+
+
+.divination-content {
+  padding: 20px;
+}
+
+.divination-row {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  gap: 16px;
+}
+
+.divination-row:last-child {
+  margin-bottom: 0;
+}
+
+.divination-label {
+  flex-shrink: 0;
+  width: 80px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9em;
+}
+
+.divination-value {
+  flex: 1;
+  color: #e0e0e0;
+  line-height: 1.4;
+}
+
+.divination-footer {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 12px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.divination-note {
+  font-size: 0.85em;
+  color: #888;
+  font-style: italic;
+}
+
+/* 回退模式樣式 */
+.divination-card--fallback {
+  border-color: rgba(255, 165, 0, 0.3);
+}
+
+.divination-card--fallback .divination-header {
+  background: linear-gradient(135deg, 
+    rgba(255, 165, 0, 0.15) 0%, 
+    rgba(255, 165, 0, 0.05) 100%);
+  border-bottom-color: rgba(255, 165, 0, 0.2);
+}
+
+.divination-card--fallback .divination-header h4,
+.divination-card--fallback .divination-header h5 {
+  color: #ffa500;
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+  .divination-header {
+    padding: 14px 16px;
+  }
+  
+  .divination-content {
+    padding: 16px;
+  }
+  
+  .divination-row {
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 16px;
+  }
+  
+  .divination-label {
+    width: auto;
+    font-size: 0.85em;
+    margin-bottom: 2px;
+  }
+  
+  .divination-footer {
+    padding: 10px 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .divination-card {
+    margin: 16px -10px;
+    border-radius: 8px;
+  }
+  
+  .divination-header {
+    padding: 12px 14px;
+  }
+  
+  .divination-content {
+    padding: 14px;
+  }
+  
+  .divination-footer {
+    padding: 8px 14px;
+  }
+}
+
+/* 運勢內容卡片樣式 */
+.fortune-card {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  margin: 20px 0;
+  overflow: hidden;
+  box-shadow: var(--glass-shadow);
+  transition: all 0.3s ease;
+}
+
+.fortune-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25), 0 0 16px rgba(var(--theme-color-rgb), 0.08);
+}
+
+.fortune-header {
+  background: linear-gradient(135deg, 
+    rgba(var(--theme-color-rgb), 0.12) 0%, 
+    rgba(var(--theme-color-rgb), 0.04) 100%);
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(var(--theme-color-rgb), 0.08);
+}
+
+.fortune-header h4 {
+  margin: 0;
+  color: var(--theme-color);
+  font-size: 1.1em;
+  font-weight: 600;
+}
+
+.fortune-content {
+  padding: 20px;
+  line-height: 1.6;
+}
+
+.fortune-content p {
+  margin: 0;
+  color: #e0e0e0;
+}
+
+/* 不同類型卡片的特殊樣式 */
+.fortune-card--advice {
+  border-color: rgba(66, 165, 245, 0.3);
+}
+
+.fortune-card--advice .fortune-header {
+  background: linear-gradient(135deg, 
+    rgba(66, 165, 245, 0.15) 0%, 
+    rgba(66, 165, 245, 0.05) 100%);
+  border-bottom-color: rgba(66, 165, 245, 0.15);
+}
+
+.fortune-card--advice .fortune-header h4 {
+  color: #42a5f5;
+}
+
+.fortune-card--theme {
+  border-color: rgba(156, 39, 176, 0.3);
+}
+
+.fortune-card--theme .fortune-header {
+  background: linear-gradient(135deg, 
+    rgba(156, 39, 176, 0.15) 0%, 
+    rgba(156, 39, 176, 0.05) 100%);
+  border-bottom-color: rgba(156, 39, 176, 0.15);
+}
+
+.fortune-card--theme .fortune-header h4 {
+  color: #9c27b0;
+}
+
+.fortune-card--foundation {
+  border-color: rgba(255, 152, 0, 0.3);
+}
+
+.fortune-card--foundation .fortune-header {
+  background: linear-gradient(135deg, 
+    rgba(255, 152, 0, 0.15) 0%, 
+    rgba(255, 152, 0, 0.05) 100%);
+  border-bottom-color: rgba(255, 152, 0, 0.15);
+}
+
+.fortune-card--foundation .fortune-header h4 {
+  color: #ff9800;
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+  .fortune-header {
+    padding: 14px 16px;
+  }
+  
+  .fortune-content {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .fortune-card {
+    margin: 16px -10px;
+    border-radius: 8px;
+  }
+  
+  .fortune-header {
+    padding: 12px 14px;
+  }
+  
+  .fortune-content {
+    padding: 14px;
+  }
+}
+
+/* 2x2 策略方塊布局 */
+.strategy-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 20px;
+  margin: 20px 0;
+}
+
+.divination-details-card .divination-card {
+  margin: 0;
+}
+
+/* 六爻卦象卡片樣式 */
+.hexagram-card {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: var(--glass-shadow);
+  transition: all 0.3s ease;
+  border-color: rgba(255, 215, 0, 0.4);
+}
+
+.hexagram-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2), 0 0 12px rgba(255, 215, 0, 0.1);
+}
+
+.hexagram-card-header {
+  background: linear-gradient(135deg, 
+    rgba(255, 215, 0, 0.15) 0%, 
+    rgba(255, 215, 0, 0.05) 100%);
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+}
+
+.hexagram-card-header h5 {
+  margin: 0;
+  color: #ffd700;
+  font-size: 1em;
+  font-weight: 600;
+}
+
+.hexagram-card-body {
+  padding: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 140px;
+}
+
+.hexagram-card .hexagram-display {
+  margin: 0;
+  font-size: 14px;
+  padding: 8px 12px;
+  min-width: 120px;
+  width: 120px;
+}
+
+.hexagram-card .hexagram-row {
+  margin-bottom: 1px;
+  padding: 0.5px 0;
+}
+
+.hexagram-card .yao-number {
+  width: 16px;
+  font-size: 8px;
+  margin-left: 6px;
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+  .strategy-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .hexagram-card-header {
+    padding: 10px 14px;
+  }
+  
+  .hexagram-card-body {
+    padding: 12px;
+    min-height: 120px;
+  }
+  
+  .hexagram-card .hexagram-display {
+    font-size: 13px;
+    width: 110px;
+    min-width: 110px;
+  }
+  
+  .hexagram-card .yao-number {
+    width: 15px;
+    font-size: 7px;
+  }
+}
+
+@media (max-width: 480px) {
+  .strategy-grid {
+    margin: 16px 0;
+    gap: 10px;
+  }
+  
+  .hexagram-card-header {
+    padding: 8px 12px;
+  }
+  
+  .hexagram-card-body {
+    padding: 10px;
+    min-height: 100px;
+  }
+  
+  .hexagram-card .hexagram-display {
+    font-size: 12px;
+    width: 100px;
+    min-width: 100px;
+    padding: 6px 10px;
+  }
+  
+  .hexagram-card .yao-number {
+    width: 14px;
+    font-size: 7px;
+    margin-left: 4px;
+  }
+}
+
+/* 爻辭卡片樣式 */
+
+.yao-ci-card,
+.yao-ci-explanation-card {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: var(--glass-shadow);
+  transition: all 0.3s ease;
+}
+
+.yao-ci-card:hover,
+.yao-ci-explanation-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2), 0 0 12px rgba(var(--theme-color-rgb), 0.06);
+}
+
+/* 爻辭箴言卡片 */
+.yao-ci-card {
+  border-color: rgba(255, 123, 114, 0.4);
+}
+
+.yao-ci-header {
+  background: linear-gradient(135deg, 
+    rgba(255, 123, 114, 0.15) 0%, 
+    rgba(255, 123, 114, 0.05) 100%);
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255, 123, 114, 0.15);
+}
+
+.yao-ci-header h5 {
+  margin: 0;
+  color: #ff7b72;
+  font-size: 1em;
+  font-weight: 600;
+}
+
+.yao-ci-body {
+  padding: 16px;
+}
+
+.yao-ci-body .yao-ci {
+  font-size: 1.1em;
+  font-weight: 600;
+  color: #ff7b72;
+  margin: 0 0 8px 0;
+  line-height: 1.4;
+  letter-spacing: 0.3px;
+}
+
+.yao-ci-image-text {
+  font-style: italic;
+  color: #a0a0a0;
+  margin: 8px 0 0 0;
+  font-size: 0.9em;
+  line-height: 1.4;
+}
+
+/* 爻辭淺釋卡片 */
+.yao-ci-explanation-card {
+  border-color: rgba(121, 134, 203, 0.4);
+}
+
+.yao-ci-explanation-header {
+  background: linear-gradient(135deg, 
+    rgba(121, 134, 203, 0.15) 0%, 
+    rgba(121, 134, 203, 0.05) 100%);
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(121, 134, 203, 0.15);
+}
+
+.yao-ci-explanation-header h5 {
+  margin: 0;
+  color: #7986cb;
+  font-size: 1em;
+  font-weight: 600;
+}
+
+.yao-ci-explanation-body {
+  padding: 16px;
+}
+
+.yao-ci-explanation-body p {
+  margin: 0;
+  color: #e0e0e0;
+  line-height: 1.5;
+  font-style: italic;
+}
+
+/* 爻辭卡片響應式設計 */
+@media (max-width: 768px) {
+  .yao-ci-header,
+  .yao-ci-explanation-header {
+    padding: 10px 14px;
+  }
+  
+  .yao-ci-body,
+  .yao-ci-explanation-body {
+    padding: 14px;
+  }
+  
+  .yao-ci-body .yao-ci {
+    font-size: 1.05em;
+  }
+}
+
+@media (max-width: 480px) {
+  .yao-ci-header,
+  .yao-ci-explanation-header {
+    padding: 8px 12px;
+  }
+  
+  .yao-ci-body,
+  .yao-ci-explanation-body {
+    padding: 12px;
+  }
+  
+  .yao-ci-body .yao-ci {
+    font-size: 1em;
   }
 }
 
