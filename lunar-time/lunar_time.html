@@ -3,16 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>祭祀時辰查詢</title>
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" />
-    <!-- Replaced lunar-javascript with lunisolar library -->
-    <script src="https://cdn.jsdelivr.net/npm/lunisolar@latest/dist/index.umd.js"></script>
-    <meta
-      http-equiv="Cache-Control"
-      content="no-cache, no-store, must-revalidate"
-    />
-    <meta http-equiv="Pragma" content="no-cache" />
-    <meta http-equiv="Expires" content="0" />
+    <title>農曆時辰宜忌查詢</title>
     <style>
       :root {
         --bg-primary: #1a1a1b;
@@ -22,11 +13,10 @@
         --border-color: #343536;
         --theme-color: #66bb6a;
         --theme-color-rgb: 102, 187, 106;
-        --glass-accent: rgba(255, 255, 255, 0.05);
-        --text-on-theme: #ffffff;
         --auspicious-color: #4caf50;
         --inauspicious-color: #f44336;
         --neutral-color: #ff9800;
+        --selected-color: #2196f3;
       }
 
       * {
@@ -55,8 +45,7 @@
         padding: 20px;
         background: rgba(var(--theme-color-rgb), 0.1);
         border-radius: 15px;
-        backdrop-filter: blur(10px);
-        border: 1px solid var(--glass-accent);
+        border: 1px solid rgba(255, 255, 255, 0.05);
       }
 
       .header h1 {
@@ -65,114 +54,174 @@
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
-        margin-bottom: 10px;
+        margin-bottom: 20px;
+      }
+
+      .controls {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+      }
+
+      .input-group {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .input-group label {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+      }
+
+      .date-input,
+      .time-select {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 10px 15px;
+        color: var(--text-primary);
+        font-size: 1rem;
+        min-width: 180px;
+      }
+
+      .date-input:focus,
+      .time-select:focus {
+        outline: none;
+        border-color: var(--theme-color);
+        box-shadow: 0 0 0 2px rgba(var(--theme-color-rgb), 0.2);
+      }
+
+      .query-btn {
+        background: var(--theme-color);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 12px 24px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 20px;
+      }
+
+      .query-btn:hover {
+        background: #81c784;
+        transform: translateY(-2px);
       }
 
       .date-info {
         font-size: 1.1rem;
         color: var(--text-secondary);
-        margin-bottom: 20px;
+        margin-top: 15px;
       }
 
-      .daily-summary {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 20px;
-        margin-bottom: 30px;
-      }
-
-      .summary-card {
+      .selected-time-info {
         background: var(--bg-secondary);
         border-radius: 15px;
         padding: 20px;
-        border: 1px solid var(--border-color);
-        backdrop-filter: blur(10px);
+        margin-bottom: 30px;
+        border: 2px solid var(--selected-color);
+        box-shadow: 0 0 20px rgba(33, 150, 243, 0.2);
       }
 
-      .summary-card h3 {
-        color: var(--theme-color);
+      .selected-time-info h3 {
+        color: var(--selected-color);
         margin-bottom: 15px;
-        font-size: 1.2rem;
+        font-size: 1.3rem;
         display: flex;
         align-items: center;
         gap: 10px;
       }
 
-      .summary-card .icon {
-        font-size: 1.5rem;
+      .time-details {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 15px;
       }
 
-      .yi-ji-content {
+      .yi-ji-section h4 {
+        margin-bottom: 10px;
+        font-size: 1.1rem;
+      }
+
+      .yi-section h4 {
+        color: var(--auspicious-color);
+      }
+
+      .ji-section h4 {
+        color: var(--inauspicious-color);
+      }
+
+      .yi-ji-items {
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
-      }
-
-      .yi-ji-item {
-        padding: 5px 10px;
-        border-radius: 8px;
-        font-size: 0.9rem;
-        font-weight: 500;
       }
 
       .yi-item {
         background: rgba(76, 175, 80, 0.2);
         color: var(--auspicious-color);
         border: 1px solid var(--auspicious-color);
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 0.9rem;
       }
 
       .ji-item {
         background: rgba(244, 67, 54, 0.2);
         color: var(--inauspicious-color);
         border: 1px solid var(--inauspicious-color);
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 0.9rem;
       }
 
-      .time-grid {
+      .sacrifice-analysis {
+        background: rgba(var(--theme-color-rgb), 0.1);
+        border-radius: 10px;
+        padding: 15px;
+        border-left: 4px solid var(--theme-color);
+      }
+
+      .sacrifice-status {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+        font-weight: bold;
+        font-size: 1.1rem;
+      }
+
+      .sacrifice-status.suitable {
+        color: var(--auspicious-color);
+      }
+
+      .sacrifice-status.unsuitable {
+        color: var(--inauspicious-color);
+      }
+
+      .sacrifice-status.neutral {
+        color: var(--neutral-color);
+      }
+
+      .all-times-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
         gap: 15px;
-        margin-top: 20px;
       }
 
       .time-card {
         background: var(--bg-secondary);
         border-radius: 12px;
-        padding: 20px;
+        padding: 15px;
         border: 1px solid var(--border-color);
         transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
-      }
-
-      .time-card::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: var(--neutral-color);
-        transition: background 0.3s ease;
-      }
-
-      .time-card.perfect-sacrifice::before {
-        background: linear-gradient(90deg, #4caf50, #66bb6a);
-      }
-
-      .time-card.good-sacrifice::before {
-        background: var(--auspicious-color);
-      }
-
-      .time-card.neutral-sacrifice::before {
-        background: var(--neutral-color);
-      }
-
-      .time-card.cautious-sacrifice::before {
-        background: #ff9800;
-      }
-
-      .time-card.avoid-sacrifice::before {
-        background: var(--inauspicious-color);
+        cursor: pointer;
       }
 
       .time-card:hover {
@@ -181,15 +230,25 @@
         box-shadow: 0 8px 25px rgba(var(--theme-color-rgb), 0.2);
       }
 
-      .time-header {
+      .time-card.selected {
+        border: 2px solid var(--selected-color);
+        background: rgba(33, 150, 243, 0.1);
+      }
+
+      .time-card.current {
+        border: 2px solid var(--neutral-color);
+        background: rgba(255, 152, 0, 0.1);
+      }
+
+      .time-card-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 15px;
+        margin-bottom: 10px;
       }
 
       .time-name {
-        font-size: 1.3rem;
+        font-size: 1.2rem;
         font-weight: bold;
         color: var(--theme-color);
       }
@@ -198,229 +257,66 @@
         font-size: 0.9rem;
         color: var(--text-secondary);
         background: var(--bg-primary);
-        padding: 5px 10px;
-        border-radius: 20px;
-      }
-
-      .sacrifice-status-display {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin-bottom: 10px;
-      }
-
-      .status-indicator {
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        background: var(--neutral-color);
-      }
-
-      .status-indicator.perfect-sacrifice {
-        background: linear-gradient(45deg, #4caf50, #66bb6a);
-      }
-
-      .status-indicator.good-sacrifice {
-        background: var(--auspicious-color);
-      }
-
-      .status-indicator.neutral-sacrifice {
-        background: var(--neutral-color);
-      }
-
-      .status-indicator.cautious-sacrifice {
-        background: #ff9800;
-      }
-
-      .status-indicator.avoid-sacrifice {
-        background: var(--inauspicious-color);
-      }
-
-      .status-text {
-        font-weight: 500;
-        font-size: 1rem;
-      }
-
-      .time-details {
-        font-size: 0.9rem;
-        color: var(--text-secondary);
-        line-height: 1.5;
-      }
-
-      .gods-info {
-        margin-top: 15px;
-        padding-top: 15px;
-        border-top: 1px solid var(--border-color);
-      }
-
-      .gods-info h4 {
-        color: var(--theme-color);
-        margin-bottom: 10px;
-        font-size: 1rem;
-      }
-
-      .gods-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-        gap: 10px;
-      }
-
-      .god-item {
-        text-align: center;
-        padding: 8px;
-        background: rgba(var(--theme-color-rgb), 0.1);
-        border-radius: 8px;
-        font-size: 0.85rem;
-      }
-
-      .god-name {
-        font-weight: bold;
-        color: var(--theme-color);
-        margin-bottom: 3px;
-      }
-
-      .god-direction {
-        color: var(--text-secondary);
-      }
-
-      .sacrifice-analysis {
-        grid-column: span 1;
-        min-width: 100%;
-      }
-
-      .sacrifice-content {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-      }
-
-      .sacrifice-status {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 15px;
-        border-radius: 10px;
-        font-weight: 500;
-      }
-
-      .sacrifice-status.highly_suitable {
-        background: rgba(76, 175, 80, 0.2);
-        border: 2px solid var(--auspicious-color);
-        color: var(--auspicious-color);
-      }
-
-      .sacrifice-status.suitable {
-        background: rgba(76, 175, 80, 0.1);
-        border: 2px solid rgba(76, 175, 80, 0.6);
-        color: #81c784;
-      }
-
-      .sacrifice-status.cautious {
-        background: rgba(255, 152, 0, 0.2);
-        border: 2px solid var(--neutral-color);
-        color: var(--neutral-color);
-      }
-
-      .sacrifice-status.not_suitable {
-        background: rgba(244, 67, 54, 0.2);
-        border: 2px solid var(--inauspicious-color);
-        color: var(--inauspicious-color);
-      }
-
-      .sacrifice-status.neutral {
-        background: rgba(var(--theme-color-rgb), 0.1);
-        border: 2px solid rgba(var(--theme-color-rgb), 0.6);
-        color: var(--theme-color);
-      }
-
-      .sacrifice-status-icon {
-        font-size: 1.5rem;
-      }
-
-      .sacrifice-details {
-        background: rgba(var(--theme-color-rgb), 0.05);
-        padding: 12px;
-        border-radius: 8px;
-        font-size: 0.9rem;
-        line-height: 1.5;
-        color: var(--text-secondary);
-      }
-
-      .sacrifice-info {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        margin-top: 10px;
-      }
-
-      .sacrifice-item {
         padding: 4px 8px;
+        border-radius: 12px;
+      }
+
+      .time-sacrifice-status {
+        font-size: 0.9rem;
+        padding: 5px 10px;
         border-radius: 6px;
-        font-size: 0.8rem;
-        background: rgba(var(--theme-color-rgb), 0.1);
-        color: var(--theme-color);
-        border: 1px solid rgba(var(--theme-color-rgb), 0.3);
+        text-align: center;
+        margin-bottom: 8px;
       }
 
-      .time-sacrifice-advice {
-        margin-top: 10px;
-        padding: 8px 12px;
-        border-radius: 8px;
-        background: rgba(var(--theme-color-rgb), 0.08);
-        font-size: 0.85rem;
-        font-weight: 500;
-        border-left: 3px solid var(--theme-color);
+      .time-sacrifice-status.suitable {
+        background: rgba(76, 175, 80, 0.2);
+        color: var(--auspicious-color);
+        border: 1px solid var(--auspicious-color);
       }
 
-      .refresh-btn {
-        position: fixed;
-        bottom: 30px;
-        right: 30px;
-        background: var(--theme-color);
-        color: var(--text-on-theme);
-        border: none;
-        border-radius: 50%;
-        width: 60px;
-        height: 60px;
-        font-size: 1.5rem;
-        cursor: pointer;
-        box-shadow: 0 4px 20px rgba(var(--theme-color-rgb), 0.4);
-        transition: all 0.3s ease;
-        z-index: 100;
+      .time-sacrifice-status.unsuitable {
+        background: rgba(244, 67, 54, 0.2);
+        color: var(--inauspicious-color);
+        border: 1px solid var(--inauspicious-color);
       }
 
-      .refresh-btn:hover {
-        transform: scale(1.1) rotate(180deg);
-        box-shadow: 0 6px 25px rgba(var(--theme-color-rgb), 0.6);
+      .time-sacrifice-status.neutral {
+        background: rgba(255, 152, 0, 0.2);
+        color: var(--neutral-color);
+        border: 1px solid var(--neutral-color);
+      }
+
+      .loading,
+      .error {
+        text-align: center;
+        padding: 40px;
+        font-size: 1.1rem;
+      }
+
+      .error {
+        color: var(--inauspicious-color);
+        background: rgba(244, 67, 54, 0.1);
+        border-radius: 10px;
+        border: 1px solid var(--inauspicious-color);
       }
 
       @media (max-width: 768px) {
-        body {
-          padding: 15px;
+        .controls {
+          flex-direction: column;
+          gap: 15px;
+        }
+
+        .time-details {
+          grid-template-columns: 1fr;
+        }
+
+        .all-times-grid {
+          grid-template-columns: 1fr;
         }
 
         .header h1 {
           font-size: 2rem;
-        }
-
-        .daily-summary {
-          grid-template-columns: 1fr;
-        }
-
-        .sacrifice-analysis {
-          grid-column: span 1;
-        }
-
-        .time-grid {
-          grid-template-columns: 1fr;
-        }
-
-        .refresh-btn {
-          width: 50px;
-          height: 50px;
-          font-size: 1.2rem;
-          bottom: 20px;
-          right: 20px;
         }
       }
     </style>
@@ -428,29 +324,431 @@
   <body>
     <div class="container">
       <header class="header">
-        <h1>🙏 祭祀時辰查詢</h1>
+        <h1>🗓️ 農曆時辰宜忌查詢</h1>
+        <div class="controls">
+          <div class="input-group">
+            <label for="date-input">選擇日期</label>
+            <input type="date" id="date-input" class="date-input" />
+          </div>
+          <div class="input-group">
+            <label for="time-select">選擇時辰</label>
+            <select id="time-select" class="time-select">
+              <option value="0">子時 (23:00-00:59)</option>
+              <option value="1">丑時 (01:00-02:59)</option>
+              <option value="2">寅時 (03:00-04:59)</option>
+              <option value="3">卯時 (05:00-06:59)</option>
+              <option value="4">辰時 (07:00-08:59)</option>
+              <option value="5">巳時 (09:00-10:59)</option>
+              <option value="6">午時 (11:00-12:59)</option>
+              <option value="7">未時 (13:00-14:59)</option>
+              <option value="8">申時 (15:00-16:59)</option>
+              <option value="9">酉時 (17:00-18:59)</option>
+              <option value="10">戌時 (19:00-20:59)</option>
+              <option value="11">亥時 (21:00-22:59)</option>
+            </select>
+          </div>
+          <button onclick="queryDateTime()" class="query-btn">查詢</button>
+        </div>
         <div class="date-info" id="date-info"></div>
       </header>
 
-      <div class="daily-summary">
-        <div class="summary-card sacrifice-analysis">
-          <h3><span class="icon">🙏</span>今日祭祀適宜性</h3>
-          <div class="sacrifice-content" id="sacrifice-content"></div>
+      <div id="loading" class="loading" style="display: none">
+        <p>正在載入農曆資料...</p>
+      </div>
+
+      <div id="error" class="error" style="display: none"></div>
+
+      <div id="content" style="display: none">
+        <!-- 選定時辰詳細信息 -->
+        <div class="selected-time-info" id="selected-time-info">
+          <h3><span>🕐</span>選定時辰詳情</h3>
+          <div id="selected-time-content"></div>
         </div>
-      </div>
 
-      <div class="gods-info">
-        <h4>🎯 吉神方位</h4>
-        <div class="gods-grid" id="gods-grid"></div>
+        <!-- 所有時辰概覽 -->
+        <div class="all-times-grid" id="all-times-grid"></div>
       </div>
-
-      <div class="time-grid" id="time-grid"></div>
     </div>
 
-    <button class="refresh-btn" onclick="updateData()" title="重新整理">
-      🔄
-    </button>
+    <script type="module">
+      // 導入 tyme4ts 庫
+      // 全域變數
+      let tyme = null;
 
-    <script src="lunar_time.js?v=2"></script>
+      // 時辰名稱和時間段
+      const timeNames = [
+        "子",
+        "丑",
+        "寅",
+        "卯",
+        "辰",
+        "巳",
+        "午",
+        "未",
+        "申",
+        "酉",
+        "戌",
+        "亥",
+      ];
+      const timePeriods = [
+        "23:00-00:59",
+        "01:00-02:59",
+        "03:00-04:59",
+        "05:00-06:59",
+        "07:00-08:59",
+        "09:00-10:59",
+        "11:00-12:59",
+        "13:00-14:59",
+        "15:00-16:59",
+        "17:00-18:59",
+        "19:00-20:59",
+        "21:00-22:59",
+      ];
+
+      let currentLunarDay = null;
+      let selectedTimeIndex = 0;
+
+      // 初始化
+      document.addEventListener("DOMContentLoaded", async function () {
+        try {
+          // 載入 tyme4ts 庫
+          tyme = await import("./tyme4ts.mjs");
+          console.log("tyme4ts 庫載入成功");
+
+          // 初始化日期時間
+          initializeDateTime();
+          queryDateTime();
+        } catch (error) {
+          console.error("tyme4ts 庫載入失敗:", error);
+          showError("tyme4ts 庫載入失敗，請確保在 HTTP 服務器環境下運行此頁面");
+        }
+      });
+
+      // 初始化日期和時辰
+      function initializeDateTime() {
+        const now = new Date();
+
+        // 設定日期
+        const dateInput = document.getElementById("date-input");
+        dateInput.value = now.toISOString().split("T")[0];
+
+        // 設定當前時辰
+        const timeSelect = document.getElementById("time-select");
+        const currentTimeIndex = getCurrentTimeIndex(now.getHours());
+        timeSelect.value = currentTimeIndex;
+        selectedTimeIndex = currentTimeIndex;
+
+        console.log("初始化完成 - 當前時辰:", timeNames[currentTimeIndex]);
+      }
+
+      // 根據小時獲取時辰索引
+      function getCurrentTimeIndex(hour) {
+        if (hour >= 23 || hour < 1) return 0; // 子時
+        if (hour >= 1 && hour < 3) return 1; // 丑時
+        if (hour >= 3 && hour < 5) return 2; // 寅時
+        if (hour >= 5 && hour < 7) return 3; // 卯時
+        if (hour >= 7 && hour < 9) return 4; // 辰時
+        if (hour >= 9 && hour < 11) return 5; // 巳時
+        if (hour >= 11 && hour < 13) return 6; // 午時
+        if (hour >= 13 && hour < 15) return 7; // 未時
+        if (hour >= 15 && hour < 17) return 8; // 申時
+        if (hour >= 17 && hour < 19) return 9; // 酉時
+        if (hour >= 19 && hour < 21) return 10; // 戌時
+        if (hour >= 21 && hour < 23) return 11; // 亥時
+        return 0;
+      }
+
+      // 查詢日期時辰
+      async function queryDateTime() {
+        if (!tyme) {
+          showError("tyme4ts 庫尚未載入，請稍後再試");
+          return;
+        }
+
+        const dateInput = document.getElementById("date-input");
+        const timeSelect = document.getElementById("time-select");
+
+        const selectedDate = new Date(dateInput.value);
+        selectedTimeIndex = parseInt(timeSelect.value);
+
+        if (isNaN(selectedDate.getTime())) {
+          showError("請選擇有效的日期");
+          return;
+        }
+
+        showLoading();
+
+        try {
+          console.log(
+            "查詢日期:",
+            selectedDate,
+            "時辰索引:",
+            selectedTimeIndex
+          );
+
+          // 使用 tyme4ts 獲取農曆資料
+          const solar = tyme.SolarDay.fromYmd(
+            selectedDate.getFullYear(),
+            selectedDate.getMonth() + 1,
+            selectedDate.getDate()
+          );
+
+          currentLunarDay = solar.getLunarDay();
+          console.log("農曆日期對象:", currentLunarDay);
+
+          // 更新頁面內容
+          updateDateInfo(solar, currentLunarDay);
+          updateSelectedTimeInfo();
+          updateAllTimesGrid();
+
+          showContent();
+        } catch (error) {
+          console.error("查詢失敗:", error);
+          showError("查詢農曆資料失敗：" + error.message);
+        }
+      }
+
+      // 更新日期資訊
+      function updateDateInfo(solar, lunar) {
+        const dateInfo = document.getElementById("date-info");
+        const solarStr = `${solar.getYear()}年${solar.getMonth()}月${solar.getDay()}日`;
+        const lunarStr = `${lunar.getYear()}年${lunar.getMonth()}月${lunar.getDay()}日`;
+        const weekday = solar.getWeek().getName();
+
+        dateInfo.innerHTML = `
+                <div><strong>公曆:</strong> ${solarStr} (${weekday})</div>
+                <div><strong>農曆:</strong> ${lunarStr}</div>
+            `;
+      }
+
+      // 更新選定時辰信息
+      function updateSelectedTimeInfo() {
+        if (!currentLunarDay) return;
+
+        const selectedTimeContent = document.getElementById(
+          "selected-time-content"
+        );
+        const timeName = timeNames[selectedTimeIndex];
+        const timePeriod = timePeriods[selectedTimeIndex];
+
+        try {
+          const lunarHours = currentLunarDay.getHours();
+          const lunarHour = lunarHours[selectedTimeIndex];
+
+          if (!lunarHour) {
+            selectedTimeContent.innerHTML = "<p>無法獲取該時辰的資料</p>";
+            return;
+          }
+
+          const recommends = lunarHour
+            .getRecommends()
+            .map((item) => item.getName());
+          const avoids = lunarHour.getAvoids().map((item) => item.getName());
+          const sacrificeStatus = analyzeSacrificeStatus(recommends, avoids);
+
+          selectedTimeContent.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h4 style="color: var(--selected-color); font-size: 1.4rem;">${timeName}時 (${timePeriod})</h4>
+                        <div class="sacrifice-status ${sacrificeStatus.class}">
+                            <span>${sacrificeStatus.icon}</span>
+                            <span>${sacrificeStatus.text}</span>
+                        </div>
+                    </div>
+                    <div class="time-details">
+                        <div class="yi-ji-section yi-section">
+                            <h4>✅ 宜事</h4>
+                            <div class="yi-ji-items">
+                                ${
+                                  recommends.length > 0
+                                    ? recommends
+                                        .map(
+                                          (item) =>
+                                            `<span class="yi-item">${item}</span>`
+                                        )
+                                        .join("")
+                                    : '<span style="color: var(--text-secondary);">無特別宜事</span>'
+                                }
+                            </div>
+                        </div>
+                        <div class="yi-ji-section ji-section">
+                            <h4>❌ 忌事</h4>
+                            <div class="yi-ji-items">
+                                ${
+                                  avoids.length > 0
+                                    ? avoids
+                                        .map(
+                                          (item) =>
+                                            `<span class="ji-item">${item}</span>`
+                                        )
+                                        .join("")
+                                    : '<span style="color: var(--text-secondary);">無特別忌事</span>'
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sacrifice-analysis">
+                        <h4 style="color: var(--theme-color); margin-bottom: 8px;">🙏 祭祀建議</h4>
+                        <p style="line-height: 1.6;">${
+                          sacrificeStatus.advice
+                        }</p>
+                    </div>
+                `;
+        } catch (error) {
+          console.error("更新選定時辰信息失敗:", error);
+          selectedTimeContent.innerHTML =
+            '<p style="color: var(--inauspicious-color);">載入時辰資料失敗</p>';
+        }
+      }
+
+      // 更新所有時辰網格
+      function updateAllTimesGrid() {
+        if (!currentLunarDay) return;
+
+        const allTimesGrid = document.getElementById("all-times-grid");
+        const currentHour = new Date().getHours();
+        const currentTimeIndex = getCurrentTimeIndex(currentHour);
+
+        try {
+          const lunarHours = currentLunarDay.getHours();
+          let gridHtml = "";
+
+          for (let i = 0; i < 12; i++) {
+            const timeName = timeNames[i];
+            const timePeriod = timePeriods[i];
+            const lunarHour = lunarHours[i];
+
+            let cardClasses = "time-card";
+            let timeLabel = `${timeName}時`;
+
+            if (i === selectedTimeIndex) {
+              cardClasses += " selected";
+              timeLabel += " (查詢中)";
+            } else if (i === currentTimeIndex) {
+              cardClasses += " current";
+              timeLabel += " (現在)";
+            }
+
+            let sacrificeStatusHtml = "";
+            if (lunarHour) {
+              const recommends = lunarHour
+                .getRecommends()
+                .map((item) => item.getName());
+              const avoids = lunarHour
+                .getAvoids()
+                .map((item) => item.getName());
+              const sacrificeStatus = analyzeSacrificeStatus(
+                recommends,
+                avoids
+              );
+
+              sacrificeStatusHtml = `
+                            <div class="time-sacrifice-status ${sacrificeStatus.class}">
+                                ${sacrificeStatus.icon} ${sacrificeStatus.text}
+                            </div>
+                        `;
+            }
+
+            gridHtml += `
+                        <div class="${cardClasses}" onclick="selectTime(${i})">
+                            <div class="time-card-header">
+                                <div class="time-name">${timeLabel}</div>
+                                <div class="time-period">${timePeriod}</div>
+                            </div>
+                            ${sacrificeStatusHtml}
+                        </div>
+                    `;
+          }
+
+          allTimesGrid.innerHTML = gridHtml;
+        } catch (error) {
+          console.error("更新時辰網格失敗:", error);
+          allTimesGrid.innerHTML = '<div class="error">載入時辰資料失敗</div>';
+        }
+      }
+
+      // 分析祭祀適宜性
+      function analyzeSacrificeStatus(recommends, avoids) {
+        const sacrificeKeywords = [
+          "祭祀",
+          "祈福",
+          "拜神",
+          "祭拜",
+          "上香",
+          "燒香",
+          "敬神",
+          "祈願",
+          "祈禱",
+        ];
+
+        const suitableForSacrifice = recommends.some((item) =>
+          sacrificeKeywords.some((keyword) => item.includes(keyword))
+        );
+
+        const tabooForSacrifice = avoids.some((item) =>
+          sacrificeKeywords.some((keyword) => item.includes(keyword))
+        );
+
+        if (suitableForSacrifice) {
+          return {
+            class: "suitable",
+            icon: "✅",
+            text: "適合祭祀",
+            advice:
+              "此時辰適宜祭祀祈福，可進行祭拜儀式，準備香燭供品，虔誠祭拜可得神靈庇佑。",
+          };
+        } else if (tabooForSacrifice) {
+          return {
+            class: "unsuitable",
+            icon: "❌",
+            text: "不宜祭祀",
+            advice: "此時辰不宜進行祭祀活動，建議選擇其他時辰，以免衝撞神靈。",
+          };
+        } else {
+          return {
+            class: "neutral",
+            icon: "⚠️",
+            text: "可謹慎祭祀",
+            advice:
+              "此時辰無明確祭祀宜忌，可進行一般性祭拜，但需保持恭敬虔誠之心。",
+          };
+        }
+      }
+
+      // 選擇時辰
+      function selectTime(timeIndex) {
+        selectedTimeIndex = timeIndex;
+        const timeSelect = document.getElementById("time-select");
+        timeSelect.value = timeIndex;
+
+        updateSelectedTimeInfo();
+        updateAllTimesGrid();
+      }
+
+      // 顯示載入中
+      function showLoading() {
+        document.getElementById("loading").style.display = "block";
+        document.getElementById("error").style.display = "none";
+        document.getElementById("content").style.display = "none";
+      }
+
+      // 顯示錯誤
+      function showError(message) {
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("error").style.display = "block";
+        document.getElementById("error").textContent = message;
+        document.getElementById("content").style.display = "none";
+      }
+
+      // 顯示內容
+      function showContent() {
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("error").style.display = "none";
+        document.getElementById("content").style.display = "block";
+      }
+
+      // 將函數暴露到全域作用域
+      window.queryDateTime = queryDateTime;
+      window.selectTime = selectTime;
+    </script>
   </body>
 </html>
