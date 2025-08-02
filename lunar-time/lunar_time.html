@@ -11,12 +11,12 @@
         --text-primary: #d7dadc;
         --text-secondary: #818384;
         --border-color: #343536;
-        --theme-color: #66bb6a;
-        --theme-color-rgb: 102, 187, 106;
-        --auspicious-color: #4caf50;
-        --inauspicious-color: #f44336;
-        --neutral-color: #ff9800;
-        --selected-color: #2196f3;
+        --theme-color: #7a8471;
+        --theme-color-rgb: 122, 132, 113;
+        --auspicious-color: #6b8e5a;
+        --inauspicious-color: #a67c7c;
+        --neutral-color: #b8956b;
+        --selected-color: #6b8db5;
       }
 
       * {
@@ -50,7 +50,7 @@
 
       .header h1 {
         font-size: 2.5rem;
-        background: linear-gradient(135deg, var(--theme-color), #81c784);
+        background: linear-gradient(135deg, var(--theme-color), #8a9481);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
@@ -109,7 +109,7 @@
       }
 
       .query-btn:hover {
-        background: #81c784;
+        background: #8a9481;
         transform: translateY(-2px);
       }
 
@@ -125,7 +125,7 @@
         padding: 20px;
         margin-bottom: 30px;
         border: 2px solid var(--selected-color);
-        box-shadow: 0 0 20px rgba(33, 150, 243, 0.2);
+        box-shadow: 0 0 20px rgba(107, 141, 181, 0.2);
       }
 
       .selected-time-info h3 {
@@ -164,18 +164,18 @@
       }
 
       .yi-item {
-        background: rgba(76, 175, 80, 0.2);
+        background: rgba(107, 142, 90, 0.15);
         color: var(--auspicious-color);
-        border: 1px solid var(--auspicious-color);
+        border: 1px solid rgba(107, 142, 90, 0.4);
         padding: 4px 8px;
         border-radius: 6px;
         font-size: 0.9rem;
       }
 
       .ji-item {
-        background: rgba(244, 67, 54, 0.2);
+        background: rgba(166, 124, 124, 0.15);
         color: var(--inauspicious-color);
-        border: 1px solid var(--inauspicious-color);
+        border: 1px solid rgba(166, 124, 124, 0.4);
         padding: 4px 8px;
         border-radius: 6px;
         font-size: 0.9rem;
@@ -232,12 +232,7 @@
 
       .time-card.selected {
         border: 2px solid var(--selected-color);
-        background: rgba(33, 150, 243, 0.1);
-      }
-
-      .time-card.current {
-        border: 2px solid var(--neutral-color);
-        background: rgba(255, 152, 0, 0.1);
+        background: rgba(107, 141, 181, 0.1);
       }
 
       .time-card-header {
@@ -253,12 +248,32 @@
         color: var(--theme-color);
       }
 
+      /* 根據祭祀狀態顯示不同顏色的時辰名稱 */
+      .time-card.sacrifice-suitable .time-name {
+        color: var(--auspicious-color);
+      }
+
+      .time-card.sacrifice-unsuitable .time-name {
+        color: var(--inauspicious-color);
+      }
+
+      .time-card.sacrifice-neutral .time-name {
+        color: var(--neutral-color);
+      }
+
       .time-period {
         font-size: 0.9rem;
         color: var(--text-secondary);
         background: var(--bg-primary);
         padding: 4px 8px;
         border-radius: 12px;
+      }
+
+      /* 當前時辰的時間標示用不同顏色 */
+      .time-card.current .time-period {
+        color: var(--neutral-color);
+        background: rgba(184, 149, 107, 0.2);
+        font-weight: bold;
       }
 
       .time-sacrifice-status {
@@ -270,21 +285,21 @@
       }
 
       .time-sacrifice-status.suitable {
-        background: rgba(76, 175, 80, 0.2);
+        background: rgba(107, 142, 90, 0.15);
         color: var(--auspicious-color);
-        border: 1px solid var(--auspicious-color);
+        border: 1px solid rgba(107, 142, 90, 0.4);
       }
 
       .time-sacrifice-status.unsuitable {
-        background: rgba(244, 67, 54, 0.2);
+        background: rgba(166, 124, 124, 0.15);
         color: var(--inauspicious-color);
-        border: 1px solid var(--inauspicious-color);
+        border: 1px solid rgba(166, 124, 124, 0.4);
       }
 
       .time-sacrifice-status.neutral {
-        background: rgba(255, 152, 0, 0.2);
+        background: rgba(184, 149, 107, 0.15);
         color: var(--neutral-color);
-        border: 1px solid var(--neutral-color);
+        border: 1px solid rgba(184, 149, 107, 0.4);
       }
 
       .loading,
@@ -296,7 +311,7 @@
 
       .error {
         color: var(--inauspicious-color);
-        background: rgba(244, 67, 54, 0.1);
+        background: rgba(166, 124, 124, 0.1);
         border-radius: 10px;
         border: 1px solid var(--inauspicious-color);
       }
@@ -324,7 +339,7 @@
   <body>
     <div class="container">
       <header class="header">
-        <h1>🗓️ 農曆時辰宜忌查詢</h1>
+        <h1>農曆時辰宜忌查詢</h1>
         <div class="controls">
           <div class="input-group">
             <label for="date-input">選擇日期</label>
@@ -348,6 +363,13 @@
             </select>
           </div>
           <button onclick="queryDateTime()" class="query-btn">查詢</button>
+          <button
+            onclick="goToCurrentTime()"
+            class="query-btn"
+            style="background: var(--neutral-color)"
+          >
+            回到當前時辰
+          </button>
         </div>
         <div class="date-info" id="date-info"></div>
       </header>
@@ -361,7 +383,7 @@
       <div id="content" style="display: none">
         <!-- 選定時辰詳細信息 -->
         <div class="selected-time-info" id="selected-time-info">
-          <h3><span>🕐</span>選定時辰詳情</h3>
+          <h3>選定時辰詳情</h3>
           <div id="selected-time-content"></div>
         </div>
 
@@ -528,23 +550,43 @@
         const selectedTimeContent = document.getElementById(
           "selected-time-content"
         );
+        console.log("選定時辰內容元素:", selectedTimeContent);
         const timeName = timeNames[selectedTimeIndex];
         const timePeriod = timePeriods[selectedTimeIndex];
 
         try {
           const lunarHours = currentLunarDay.getHours();
+          console.log("農曆時辰數組:", lunarHours);
+          console.log("選定時辰索引:", selectedTimeIndex);
           const lunarHour = lunarHours[selectedTimeIndex];
+          console.log("選定的農曆時辰對象:", lunarHour);
 
           if (!lunarHour) {
             selectedTimeContent.innerHTML = "<p>無法獲取該時辰的資料</p>";
             return;
           }
 
-          const recommends = lunarHour
-            .getRecommends()
-            .map((item) => item.getName());
-          const avoids = lunarHour.getAvoids().map((item) => item.getName());
+          const recommendsRaw = lunarHour.getRecommends();
+          const avoidsRaw = lunarHour.getAvoids();
+          console.log("原始宜事對象:", recommendsRaw);
+          console.log("原始忌事對象:", avoidsRaw);
+
+          const recommends = recommendsRaw.map((item) => {
+            if (typeof item === "string") return item;
+            if (item.getName) return item.getName();
+            if (item.name) return item.name;
+            return item.toString();
+          });
+          const avoids = avoidsRaw.map((item) => {
+            if (typeof item === "string") return item;
+            if (item.getName) return item.getName();
+            if (item.name) return item.name;
+            return item.toString();
+          });
+          console.log("處理後宜事:", recommends);
+          console.log("處理後忌事:", avoids);
           const sacrificeStatus = analyzeSacrificeStatus(recommends, avoids);
+          console.log("祭祀狀態:", sacrificeStatus);
 
           selectedTimeContent.innerHTML = `
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
@@ -587,12 +629,13 @@
                         </div>
                     </div>
                     <div class="sacrifice-analysis">
-                        <h4 style="color: var(--theme-color); margin-bottom: 8px;">🙏 祭祀建議</h4>
+                        <h4 style="color: var(--theme-color); margin-bottom: 8px;">祭祀建議</h4>
                         <p style="line-height: 1.6;">${
                           sacrificeStatus.advice
                         }</p>
                     </div>
                 `;
+          console.log("HTML 已設置到元素中");
         } catch (error) {
           console.error("更新選定時辰信息失敗:", error);
           selectedTimeContent.innerHTML =
@@ -622,24 +665,42 @@
 
             if (i === selectedTimeIndex) {
               cardClasses += " selected";
-              timeLabel += " (查詢中)";
-            } else if (i === currentTimeIndex) {
+            }
+
+            if (i === currentTimeIndex) {
               cardClasses += " current";
-              timeLabel += " (現在)";
             }
 
             let sacrificeStatusHtml = "";
             if (lunarHour) {
-              const recommends = lunarHour
-                .getRecommends()
-                .map((item) => item.getName());
-              const avoids = lunarHour
-                .getAvoids()
-                .map((item) => item.getName());
+              const recommendsRaw = lunarHour.getRecommends();
+              const avoidsRaw = lunarHour.getAvoids();
+
+              const recommends = recommendsRaw.map((item) => {
+                if (typeof item === "string") return item;
+                if (item.getName) return item.getName();
+                if (item.name) return item.name;
+                return item.toString();
+              });
+              const avoids = avoidsRaw.map((item) => {
+                if (typeof item === "string") return item;
+                if (item.getName) return item.getName();
+                if (item.name) return item.name;
+                return item.toString();
+              });
               const sacrificeStatus = analyzeSacrificeStatus(
                 recommends,
                 avoids
               );
+
+              // 根據祭祀狀態添加對應的 CSS 類
+              if (sacrificeStatus.class === "suitable") {
+                cardClasses += " sacrifice-suitable";
+              } else if (sacrificeStatus.class === "unsuitable") {
+                cardClasses += " sacrifice-unsuitable";
+              } else {
+                cardClasses += " sacrifice-neutral";
+              }
 
               sacrificeStatusHtml = `
                             <div class="time-sacrifice-status ${sacrificeStatus.class}">
@@ -724,6 +785,22 @@
         updateAllTimesGrid();
       }
 
+      // 回到當前時辰
+      function goToCurrentTime() {
+        const now = new Date();
+        const currentTimeIndex = getCurrentTimeIndex(now.getHours());
+
+        // 設定日期為今天
+        const dateInput = document.getElementById("date-input");
+        dateInput.value = now.toISOString().split("T")[0];
+
+        // 選擇當前時辰
+        selectTime(currentTimeIndex);
+
+        // 重新查詢資料
+        queryDateTime();
+      }
+
       // 顯示載入中
       function showLoading() {
         document.getElementById("loading").style.display = "block";
@@ -749,6 +826,7 @@
       // 將函數暴露到全域作用域
       window.queryDateTime = queryDateTime;
       window.selectTime = selectTime;
+      window.goToCurrentTime = goToCurrentTime;
     </script>
   </body>
 </html>
