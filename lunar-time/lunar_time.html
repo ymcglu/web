@@ -32,17 +32,29 @@
         color: var(--text-primary);
         margin: 0;
         padding: 0;
-        height: 100vh;
-        overflow: hidden;
+        min-height: 100vh;
+        overflow: auto;
+      }
+
+      @media (max-width: 768px) {
+        body {
+          overflow: auto;
+        }
       }
 
       .container {
         max-width: 1200px;
         margin: 0 auto;
-        height: 100vh;
+        min-height: 100vh;
         display: flex;
         flex-direction: column;
         padding: 20px;
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          min-height: calc(100vh - 20px);
+        }
       }
 
       .header {
@@ -335,9 +347,74 @@
       }
 
       @media (max-width: 768px) {
+        .container {
+          padding: 10px;
+        }
+
+        .header {
+          padding: 15px 10px;
+          margin-bottom: 15px;
+        }
+
+        .header h1 {
+          font-size: 1.6rem;
+          margin-bottom: 15px;
+        }
+
+        .header h1::before {
+          content: "好時機";
+        }
+
+        .header h1 {
+          text-indent: -9999px;
+          position: relative;
+        }
+
+        .header h1::before {
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+          text-indent: 0;
+          width: 100%;
+          text-align: center;
+        }
+
         .controls {
           flex-direction: column;
-          gap: 15px;
+          gap: 10px;
+          margin-bottom: 15px;
+        }
+
+        .input-group {
+          flex-direction: row;
+          justify-content: space-between;
+          align-items: center;
+          width: 100%;
+        }
+
+        .input-group label {
+          font-size: 0.8rem;
+          margin-right: 10px;
+          min-width: 60px;
+        }
+
+        .date-input,
+        .time-select {
+          min-width: 140px;
+          padding: 8px 12px;
+          font-size: 0.9rem;
+        }
+
+        .query-btn {
+          padding: 10px 20px;
+          font-size: 0.9rem;
+          margin-top: 10px;
+        }
+
+        .date-info {
+          font-size: 1rem;
+          margin-top: 10px;
         }
 
         .time-details {
@@ -347,9 +424,66 @@
         .all-times-grid {
           grid-template-columns: 1fr;
         }
+      }
+
+      /* 更小手機螢幕優化 */
+      @media (max-width: 480px) {
+        .container {
+          padding: 8px;
+        }
+
+        .header {
+          padding: 12px 8px;
+          margin-bottom: 12px;
+        }
 
         .header h1 {
-          font-size: 2rem;
+          font-size: 1.4rem;
+          margin-bottom: 12px;
+        }
+
+        .controls {
+          gap: 8px;
+          margin-bottom: 12px;
+        }
+
+        .input-group {
+          gap: 8px;
+        }
+
+        .input-group label {
+          font-size: 0.75rem;
+          min-width: 50px;
+        }
+
+        .date-input,
+        .time-select {
+          min-width: 120px;
+          padding: 6px 10px;
+          font-size: 0.85rem;
+        }
+
+        .query-btn {
+          padding: 8px 16px;
+          font-size: 0.85rem;
+          margin-top: 8px;
+        }
+
+        .date-info {
+          font-size: 0.9rem;
+          margin-top: 8px;
+        }
+
+        .time-card {
+          padding: 12px;
+        }
+
+        .time-name {
+          font-size: 1.1rem;
+        }
+
+        .time-period {
+          font-size: 0.8rem;
         }
       }
 
